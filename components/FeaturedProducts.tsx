@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: string;
@@ -35,6 +36,7 @@ export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { addToCart } = useCart();
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -101,13 +103,8 @@ export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
   const title = content?.title || "Luxivie Bestsellers";
   const subtitle = content?.subtitle || "Our most-loved formulas for healthier, stronger hair";
 
-  const handleAddToCart = (product: Product) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image_url: product.image_url,
-    });
+  const handleShopNow = (product: Product) => {
+    router.push(`/products/${product.id}`);
   };
 
   return (
@@ -194,7 +191,7 @@ export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
                       <Button 
                         className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full"
                         disabled={isDisabled}
-                        onClick={() => !isDisabled && handleAddToCart(product)}
+                        onClick={() => !isDisabled && handleShopNow(product)}
                       >
                         {isDisabled ? "Unavailable" : "Shop Now"}
                       </Button>

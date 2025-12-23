@@ -12,7 +12,7 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: { id: string; name: string; price: number; image_url: string }) => void;
+  addToCart: (product: { id: string; name: string; price: number; image_url: string }, quantity?: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   getCartCount: () => number;
@@ -55,17 +55,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items, isLoaded]);
 
-  const addToCart = useCallback((product: { id: string; name: string; price: number; image_url: string }) => {
+  const addToCart = useCallback((product: { id: string; name: string; price: number; image_url: string }, quantity: number = 1) => {
     setItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
         return prevItems.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prevItems, { ...product, quantity: 1 }];
+      return [...prevItems, { ...product, quantity }];
     });
   }, []);
 

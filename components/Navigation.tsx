@@ -138,7 +138,10 @@ export function Navigation() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-6">
+              <Button 
+                className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-6"
+                onClick={() => router.push("/products")}
+              >
                 Shop Now
               </Button>
             </motion.div>
@@ -197,7 +200,13 @@ export function Navigation() {
                   <ShoppingBag className="w-4 h-4 mr-2" />
                   Cart ({cartCount})
                 </Button>
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full">
+                <Button 
+                  className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full"
+                  onClick={() => {
+                    router.push("/products");
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
                   Shop Now
                 </Button>
               </div>

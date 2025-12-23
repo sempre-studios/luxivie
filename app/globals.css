@@ -594,6 +594,10 @@
     display: grid;
   }
 
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .hidden {
     display: none;
   }
@@ -2147,5 +2151,14 @@ html {
 @layer utilities {
   .py-3 {
     padding-block: calc(var(--spacing) * 3);
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
