@@ -179,25 +179,37 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-12 md:mt-16 rounded-lg"
+            className="mt-12 md:mt-16"
           >
+            <style dangerouslySetInnerHTML={{__html: `
+              [data-slot="tabs-trigger"][data-state="active"] {
+                border-bottom: 4px solid #BFC8B3 !important;
+                color: #111827 !important;
+                font-weight: 700 !important;
+              }
+              [data-slot="tabs-trigger"][data-state="inactive"] {
+                color: #6b7280 !important;
+                font-weight: 400 !important;
+                border-bottom: 4px solid transparent !important;
+              }
+            `}} />
             <Tabs defaultValue="description" className="w-full">
-              <TabsList className="w-full flex flex-row bg-white border-b border-gray-200 rounded-none h-auto p-0">
+              <TabsList className="w-full h-auto p-0 bg-white border-b-2 border-gray-200 rounded-none justify-start">
                 <TabsTrigger
                   value="description"
-                  className="w-full h-full px-6 py-4 pt-4 md:pt-6 pb-4 md:pb-6 rounded-none border-2 border-transparent data-[state=active]:border-[#BFC8B3] data-[state=active]:border-b-2 data-[state=active]:border-b-black data-[state=active]:shadow-md data-[state=active]:text-gray-900 data-[state=active]:font-semibold data-[state=active]:bg-transparent data-[state=inactive]:text-gray-600 data-[state=inactive]:font-normal hover:text-gray-900 hover:border-gray-300 text-sm whitespace-nowrap transition-all flex-1 items-center justify-center text-center"
+                  className="relative px-6 py-6 md:py-7 rounded-none border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
                 >
                   Description
                 </TabsTrigger>
                 <TabsTrigger
                   value="ingredients"
-                  className="w-full h-full px-6 py-4 pt-4 md:pt-6 pb-4 md:pb-6 rounded-none border-2 border-transparent data-[state=active]:border-[#BFC8B3] data-[state=active]:border-b-2 data-[state=active]:border-b-black data-[state=active]:shadow-md data-[state=active]:text-gray-900 data-[state=active]:font-semibold data-[state=active]:bg-transparent data-[state=inactive]:text-gray-600 data-[state=inactive]:font-normal hover:text-gray-900 hover:border-gray-300 text-sm whitespace-nowrap transition-all flex-1 items-center justify-center text-center"
+                  className="relative px-6 py-6 md:py-7 rounded-none border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
                 >
                   Ingredients
                 </TabsTrigger>
                 <TabsTrigger
                   value="howto"
-                  className="w-full h-full px-6 py-4 pt-4 md:pt-6 pb-4 md:pb-6 rounded-none border-2 border-transparent data-[state=active]:border-[#BFC8B3] data-[state=active]:border-b-2 data-[state=active]:border-b-black data-[state=active]:shadow-md data-[state=active]:text-gray-900 data-[state=active]:font-semibold data-[state=active]:bg-transparent data-[state=inactive]:text-gray-600 data-[state=inactive]:font-normal hover:text-gray-900 hover:border-gray-300 text-sm whitespace-nowrap transition-all flex-1 items-center justify-center text-center"
+                  className="relative px-6 py-6 md:py-7 rounded-none border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
                 >
                   How to Use
                 </TabsTrigger>
