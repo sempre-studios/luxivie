@@ -16,6 +16,7 @@ interface Product {
   price: number;
   original_price?: number;
   image_url: string;
+  images?: string[]; // Multiple product images
   benefits?: string[];
   status: string;
   description?: string;
@@ -25,6 +26,7 @@ interface Product {
   review_count?: number;
   sizes?: string[];
   badges?: string[];
+  is_bestseller?: boolean;
 }
 
 interface ProductDetailsPageProps {
@@ -78,11 +80,22 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     fetchProduct();
   }, [productId]);
 
-  // Default product images - use the main image_url and create variations
-  const getProductImages = (imageUrl: string): string[] => {
-    // For now, return an array with the main image repeated
-    // In a real app, you might have multiple images stored separately
-    return [imageUrl, imageUrl, imageUrl, imageUrl];
+  // Get product images - API already ensures main image is first in images array
+  const getProductImages = (): string[] => {
+    const allImages = product?.images || []
+    
+    // Remove duplicates while preserving order
+    const uniqueImages: string[] = []
+    const seen = new Set<string>()
+    for (const img of allImages) {
+      if (img && !seen.has(img)) {
+        seen.add(img)
+        uniqueImages.push(img)
+      }
+    }
+    
+    // Return up to 4 unique images (no repeating)
+    return uniqueImages.slice(0, 4)
   };
 
   if (isLoading) {
@@ -115,7 +128,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     );
   }
 
-  const productImages = getProductImages(product.image_url);
+  const productImages = getProductImages();
 
   return (
     <div className="min-h-screen bg-[#F9F9F6]">
@@ -162,9 +175,9 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 name={product.name}
                 price={product.price}
                 originalPrice={product.original_price}
-                rating={product.rating || 4.8}
+                rating={product.rating || undefined}
                 reviewCount={product.review_count || 0}
-                description={product.description || `Experience the transformative power of ${product.name}. Our signature product is a potent blend of therapeutic-grade ingredients and nourishing botanicals, scientifically formulated to deliver real results.`}
+                description={product.description || ''}
                 sizes={product.sizes}
                 badges={product.badges}
                 image_url={product.image_url}
@@ -222,21 +235,19 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                     </h2>
                     
                     {/* Introductory Paragraph */}
-                    <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6 md:mb-8">
-                      {product.description ? (
-                        product.description.split('\n\n')[0] || product.description
-                      ) : (
-                        `Our signature ${product.name} is a potent blend of therapeutic-grade ingredients and nourishing botanicals, specially formulated to promote hair growth, strengthen hair follicles, and improve overall scalp health. This luxurious treatment has become a cult favorite among those seeking natural solutions for hair care.`
-                      )}
-                </p>
+                    {product.description && (
+                      <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6 md:mb-8">
+                        {product.description.split('\n\n')[0] || product.description}
+                      </p>
+                    )}
               </div>
 
                   {/* Key Benefits Section */}
-                  <div className="space-y-4 md:space-y-5">
-                    <h3 className="text-xl md:text-2xl text-gray-900 font-semibold">Key Benefits</h3>
+                  {product.benefits && product.benefits.length > 0 && (
                     <div className="space-y-4 md:space-y-5">
-                      {product.benefits && product.benefits.length > 0 ? (
-                        product.benefits.map((benefit, index) => {
+                      <h3 className="text-xl md:text-2xl text-gray-900 font-semibold">Key Benefits</h3>
+                      <div className="space-y-4 md:space-y-5">
+                        {product.benefits.map((benefit, index) => {
                           const parts = benefit.split(':');
                           const title = parts[0]?.trim() || `Benefit ${index + 1}`;
                           const description = parts[1]?.trim() || '';
@@ -251,55 +262,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                                   {description}
                                 </p>
                               )}
-            </div>
+                            </div>
                           );
-                        })
-                      ) : (
-                        <>
-                          <div className="space-y-1 md:space-y-2">
-                            <h4 className="text-base md:text-lg text-gray-900 font-semibold">
-                              Stimulates Hair Growth
-                            </h4>
-                            <p className="text-sm md:text-base text-gray-600 leading-relaxed">
-                              Clinically proven to improve circulation to the scalp, encouraging new hair growth and reducing hair loss.
-                            </p>
-              </div>
-                          <div className="space-y-1 md:space-y-2">
-                            <h4 className="text-base md:text-lg text-gray-900 font-semibold">
-                              Strengthens Hair
-                            </h4>
-                            <p className="text-sm md:text-base text-gray-600 leading-relaxed">
-                              Rich in antioxidants that protect and fortify each strand from root to tip.
-                </p>
-              </div>
-                          <div className="space-y-1 md:space-y-2">
-                            <h4 className="text-base md:text-lg text-gray-900 font-semibold">
-                              Improves Scalp Health
-                            </h4>
-                            <p className="text-sm md:text-base text-gray-600 leading-relaxed">
-                              Natural antimicrobial properties help maintain a healthy scalp environment.
-                            </p>
-            </div>
-                          <div className="space-y-1 md:space-y-2">
-                            <h4 className="text-base md:text-lg text-gray-900 font-semibold">
-                              Adds Shine & Softness
-                            </h4>
-                            <p className="text-sm md:text-base text-gray-600 leading-relaxed">
-                              Nourishing oils deeply condition without weighing hair down.
-                            </p>
-              </div>
-                          <div className="space-y-1 md:space-y-2">
-                            <h4 className="text-base md:text-lg text-gray-900 font-semibold">
-                              Reduces Dandruff
-                            </h4>
-                            <p className="text-sm md:text-base text-gray-600 leading-relaxed">
-                              Helps balance scalp oils and soothe irritation.
-                            </p>
-                          </div>
-                        </>
-                      )}
-              </div>
-            </div>
+                        })}
+                      </div>
+                    </div>
+                  )}
 
           {/* Why Choose Luxivie Section */}
                   <div className="space-y-4 md:space-y-5 pt-4 md:pt-6 border-t border-gray-200">
@@ -366,31 +334,10 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                         <p className="text-gray-600">{product.how_to_use}</p>
                       </div>
                     ) : (
-                      <div className="space-y-4 md:space-y-6">
-                        {[
-                          { title: "Start with dry or damp hair", description: "For best results, apply to clean hair after washing. Hair can be completely dry or slightly damp." },
-                          { title: "Apply 3-5 drops to scalp", description: "Using the dropper, apply oil directly to areas of concern or evenly across the scalp. Use more for thicker or longer hair." },
-                          { title: "Massage gently", description: "Use fingertips to massage the oil into your scalp using circular motions for 2-3 minutes to boost circulation." },
-                          { title: "Leave in or overnight", description: "For quick treatment, leave in for at least 30 minutes. For intensive care, leave overnight and wash out in the morning." },
-                          { title: "Style as usual", description: "If leaving in during the day, you can style your hair normally. The oil absorbs quickly and won't leave residue." }
-                        ].map((step, index) => (
-                          <div 
-                            key={index} 
-                            className="flex items-start gap-4 md:gap-5 p-4 md:p-5"
-                          >
-                            <span className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-[#BFC8B3] text-white rounded-full flex items-center justify-center text-base md:text-lg font-semibold shadow-sm">
-                              {index + 1}
-                            </span>
-                            <div className="flex-1 space-y-2 md:space-y-3 pt-0.5">
-                              <h4 className="text-base md:text-lg text-gray-900 font-semibold">
-                                {step.title}
-                              </h4>
-                              <p className="text-sm md:text-base text-gray-600 leading-relaxed">
-                                {step.description}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="py-4 md:py-6">
+                        <p className="text-sm md:text-base text-gray-600">
+                          Usage instructions will be available soon.
+                        </p>
                       </div>
                     )}
                   </div>

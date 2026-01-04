@@ -18,6 +18,7 @@ interface Product {
   image_url: string;
   benefits?: string[];
   status: string;
+  is_bestseller?: boolean;
 }
 
 interface FeaturedProductsProps {
@@ -89,7 +90,8 @@ export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
   ];
 
   // Use API products if available, otherwise use content products, otherwise default
-  const displayProducts = products.length > 0 
+  // Limit to 6 products maximum
+  const allProducts = products.length > 0 
     ? products 
     : (content?.products?.map((p, idx) => ({
         id: `content-${idx}`,
@@ -98,7 +100,11 @@ export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
         image_url: p.image || "",
         benefits: p.benefits || [],
         status: p.badge === "Coming Soon" ? "closed for sale" : "active",
-      })) || defaultProducts);
+        is_bestseller: false,
+      })) || defaultProducts.map(p => ({ ...p, is_bestseller: false })));
+  
+  // Limit to 6 products
+  const displayProducts = allProducts.slice(0, 6);
 
   const title = content?.title || "Luxivie Bestsellers";
   const subtitle = content?.subtitle || "Our most-loved formulas for healthier, stronger hair";
@@ -155,16 +161,16 @@ export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
                         alt={product.name || "Product"}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      {index === 0 && (
+                      {product.is_bestseller && (
                         <Badge 
                           className="absolute top-4 right-4 bg-[#BFC8B3] text-white border-0"
                         >
                           Bestseller
                         </Badge>
                       )}
-                      {index !== 0 && product.status === 'out of stock' && (
+                      {product.status === 'out of stock' && (
                         <Badge 
-                          className="absolute top-4 right-4 bg-[#BFC8B3] text-white border-0"
+                          className={`absolute ${product.is_bestseller ? 'top-16' : 'top-4'} right-4 bg-gray-500 text-white border-0`}
                         >
                           Out of Stock
                         </Badge>

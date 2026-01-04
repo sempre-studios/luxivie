@@ -12,7 +12,7 @@ interface ProductInfoProps {
   name: string;
   price: number;
   originalPrice?: number;
-  rating: number;
+  rating?: number;
   reviewCount: number;
   description: string;
   sizes?: string[];
@@ -28,11 +28,11 @@ export function ProductInfo({
   rating,
   reviewCount,
   description,
-  sizes = ["30ml", "60ml", "100ml"],
-  badges = ["Vegan", "Cruelty-Free", "Made in Canada"],
+  sizes = [],
+  badges = [],
   image_url,
 }: ProductInfoProps) {
-  const [selectedSize, setSelectedSize] = useState(sizes[1] || sizes[0]);
+  const [selectedSize, setSelectedSize] = useState(sizes.length > 0 ? (sizes[1] || sizes[0]) : '');
   const [quantity, setQuantity] = useState(1);
   const [isFavorited, setIsFavorited] = useState(false);
   const { addToCart } = useCart();
@@ -53,22 +53,24 @@ export function ProductInfo({
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Badges */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-wrap gap-2"
-      >
-        {badges.map((badge, index) => (
-          <Badge
-            key={index}
-            variant="secondary"
-            className="bg-[#BFC8B3]/20 text-gray-900 hover:bg-[#BFC8B3]/30 border-0 text-xs md:text-sm"
-          >
-            {badge}
-          </Badge>
-        ))}
-      </motion.div>
+      {badges.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-wrap gap-2"
+        >
+          {badges.map((badge, index) => (
+            <Badge
+              key={index}
+              variant="secondary"
+              className="bg-[#BFC8B3]/20 text-gray-900 hover:bg-[#BFC8B3]/30 border-0 text-xs md:text-sm"
+            >
+              {badge}
+            </Badge>
+          ))}
+        </motion.div>
+      )}
 
       {/* Product Title */}
       <motion.div
@@ -79,23 +81,25 @@ export function ProductInfo({
         <h1 className="text-2xl md:text-3xl lg:text-4xl text-gray-900 mb-2 font-semibold">{name}</h1>
         
         {/* Rating */}
-        <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-          <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-3 h-3 md:w-4 md:h-4 ${
-                  i < Math.floor(rating)
-                    ? "fill-[#BFC8B3] text-[#BFC8B3]"
-                    : "text-gray-300"
-                }`}
-              />
-            ))}
+        {rating !== undefined && rating !== null && (
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-3 h-3 md:w-4 md:h-4 ${
+                    i < Math.floor(rating)
+                      ? "fill-[#BFC8B3] text-[#BFC8B3]"
+                      : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-xs md:text-sm text-gray-600">
+              {rating} ({reviewCount} reviews)
+            </span>
           </div>
-          <span className="text-xs md:text-sm text-gray-600">
-            {rating} ({reviewCount} reviews)
-          </span>
-        </div>
+        )}
       </motion.div>
 
       {/* Price */}
@@ -105,50 +109,60 @@ export function ProductInfo({
         transition={{ duration: 0.5, delay: 0.2 }}
         className="flex items-center gap-2 md:gap-3 flex-wrap"
       >
-        <span className="text-2xl md:text-3xl text-gray-900 font-semibold">
-          ${price.toFixed(2)} CAD
-        </span>
-        {originalPrice && (
-          <span className="text-lg md:text-xl text-gray-500 line-through">
-            ${originalPrice.toFixed(2)}
+        {originalPrice && originalPrice > price ? (
+          <>
+            <span className="text-lg md:text-xl text-gray-400 line-through opacity-60">
+              ${originalPrice.toFixed(2)} CAD
+            </span>
+            <span className="text-2xl md:text-3xl text-gray-900 font-semibold">
+              ${price.toFixed(2)} CAD
+            </span>
+          </>
+        ) : (
+          <span className="text-2xl md:text-3xl text-gray-900 font-semibold">
+            ${price.toFixed(2)} CAD
           </span>
         )}
       </motion.div>
 
       {/* Description */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="text-sm md:text-base text-gray-600 leading-relaxed"
-      >
-        {description}
-      </motion.p>
+      {description && (
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="text-sm md:text-base text-gray-600 leading-relaxed"
+        >
+          {description}
+        </motion.p>
+      )}
 
       {/* Size Selection */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="space-y-2 md:space-y-3"
-      >
-        <label className="block text-sm md:text-base text-gray-900 font-medium">Size</label>
-        <div className="flex gap-2 md:gap-3 flex-wrap">
-          {sizes.map((size) => (
-            <button
-              key={size}
-              onClick={() => setSelectedSize(size)}
-              className={`px-4 md:px-6 py-2 md:py-3 rounded-lg border-2 transition-all text-sm md:text-base ${
-                selectedSize === size
-                  ? "border-[#BFC8B3] bg-[#BFC8B3]/10 text-gray-900 font-medium"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
-              }`}
-            >
-              {size}
-            </button>
-          ))}
-        </div>
-      </motion.div>
+      {sizes.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="space-y-2 md:space-y-3"
+        >
+          <label className="block text-sm md:text-base text-gray-900 font-medium">Size</label>
+          <div className="flex gap-2 md:gap-3 flex-wrap">
+            {sizes.map((size) => (
+              <button
+                key={size}
+                onClick={() => setSelectedSize(size)}
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-lg border-2 transition-all text-sm md:text-base ${
+                  selectedSize === size
+                    ? "border-[#BFC8B3] bg-[#BFC8B3]/10 text-gray-900 font-medium"
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Quantity */}
       <motion.div

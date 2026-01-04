@@ -18,6 +18,7 @@ interface Product {
   benefits?: string[];
   status: string;
   sizes?: string[];
+  is_bestseller?: boolean;
 }
 
 export default function ProductsPage() {
@@ -144,17 +145,17 @@ export default function ProductsPage() {
                                 alt={product.name || "Product"}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                               />
-                              {index === 0 && (
-                                <div className="absolute top-4 left-4">
+                              {product.is_bestseller && (
+                                <div className="absolute top-4 right-4">
                                   <Badge className="bg-[#BFC8B3] text-white border-0 shadow-sm">
                                     Bestseller
                                   </Badge>
                                 </div>
                               )}
-                              {product.status !== 'active' && (
-                                <div className="absolute top-4 left-4">
+                              {!product.is_bestseller && product.status === 'out of stock' && (
+                                <div className="absolute top-4 right-4">
                                   <Badge className="bg-gray-500 text-white border-0 shadow-sm">
-                                    {product.status === 'out of stock' ? 'Out of Stock' : 'Unavailable'}
+                                    Out of Stock
                                   </Badge>
                                 </div>
                               )}

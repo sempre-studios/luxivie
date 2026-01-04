@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
@@ -10,14 +10,23 @@ interface ProductGalleryProps {
 }
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
+  // Use images directly, no repeating - show what we have (up to 4)
+  const displayImages = images.slice(0, 4).filter(img => img && img.trim() !== "");
+  
+  // Always default to first image (main image) - reset when images change
   const [selectedImage, setSelectedImage] = useState(0);
   
-  // Ensure we always have 4 images (repeat if needed)
-  const displayImages = Array.from({ length: 4 }).map((_, index) => {
-    return images[index % images.length] || images[0] || "";
-  });
+  useEffect(() => {
+    // Reset to first image (main image) whenever images array changes
+    // This ensures the main image (index 0) is always shown by default
+    setSelectedImage(0);
+  }, [images.join(',')]); // Use joined string to detect array changes
 
-  const mainImage = displayImages[selectedImage] || displayImages[0];
+  // Main image is always the first image (index 0) - this is the image set as "main" in CMS
+  const mainImage = displayImages[0] || "";
+  
+  // Currently selected image for display
+  const currentImage = displayImages[selectedImage] || mainImage;
 
   return (
     <div className="w-full space-y-3 md:space-y-4">
@@ -38,7 +47,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             className="w-full h-full"
           >
             <ImageWithFallback
-              src={mainImage}
+              src={currentImage}
               alt={`${productName} - View ${selectedImage + 1}`}
               className="w-full h-full object-cover"
             />

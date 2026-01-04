@@ -21,12 +21,14 @@ export async function GET(request: NextRequest) {
 
     const businessId = businesses.id;
 
-    // Fetch active products for this business
+    // Fetch products for this business (include active and out of stock, exclude closed for sale)
+    // Prioritize bestsellers first, then by created_at
     const { data: products, error: productsError } = await supabaseAdmin
       .from('retail_products_table')
-      .select('id, name, price, image_url, benefits, status')
+      .select('id, name, price, image_url, benefits, status, is_bestseller')
       .eq('business_id', businessId)
-      .eq('status', 'active')
+      .in('status', ['active', 'out of stock'])
+      .order('is_bestseller', { ascending: false })
       .order('created_at', { ascending: false });
 
     if (productsError) {
@@ -35,16 +37,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform products to include only first 3 benefits
-    const transformedProducts = (products || []).map((product) => ({
-      id: product.id,
-      name: product.name,
-      price: product.price ? parseFloat(String(product.price)) : 0,
-      image_url: product.image_url || '',
-      benefits: product.benefits && Array.isArray(product.benefits) 
-        ? product.benefits.slice(0, 3) 
-        : [],
-      status: product.status || 'active',
-    }));
+    // Limit to 6 products for featured display
+    const transformedProducts = (products || [])
+      .slice(0, 6)
+      .map((product) => ({
+        id: product.id,
+        name: product.name,
+        price: product.price ? parseFloat(String(product.price)) : 0,
+        image_url: product.image_url || '',
+        benefits: product.benefits && Array.isArray(product.benefits) 
+          ? product.benefits.slice(0, 3) 
+          : [],
+        status: product.status || 'active',
+        is_bestseller: product.is_bestseller || false,
+      }));
 
     // Add cache headers for better performance
     const response = NextResponse.json({ products: transformedProducts });
