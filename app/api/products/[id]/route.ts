@@ -46,7 +46,7 @@ export async function GET(
 
     // Fetch product images from files_assets
     // Order by created_at ascending to match upload order
-    const { data: productImages, error: imagesError } = await supabaseAdmin
+    const { data: productImages } = await supabaseAdmin
       .from('files_assets')
       .select('*')
       .eq('type', 'Images')

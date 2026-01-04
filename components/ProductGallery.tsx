@@ -16,11 +16,14 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   // Always default to first image (main image) - reset when images change
   const [selectedImage, setSelectedImage] = useState(0);
   
+  // Create a stable string representation of images for dependency checking
+  const imagesKey = images.join(',');
+  
   useEffect(() => {
     // Reset to first image (main image) whenever images array changes
     // This ensures the main image (index 0) is always shown by default
     setSelectedImage(0);
-  }, [images.join(',')]); // Use joined string to detect array changes
+  }, [imagesKey]); // Use stable string key to detect array changes
 
   // Main image is always the first image (index 0) - this is the image set as "main" in CMS
   const mainImage = displayImages[0] || "";

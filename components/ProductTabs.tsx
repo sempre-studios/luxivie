@@ -122,10 +122,20 @@ export function ProductTabs({
 
   // Parse ingredients if it's an array of strings
   const parsedIngredients = Array.isArray(ingredients)
-    ? ingredients.map((ing, idx) => ({
-        name: typeof ing === 'string' ? ing : ing.name || `Ingredient ${idx + 1}`,
-        description: typeof ing === 'object' && ing.description ? ing.description : '',
-      }))
+    ? ingredients.map((ing, idx) => {
+        if (typeof ing === 'string') {
+          return {
+            name: ing,
+            description: '',
+          };
+        }
+        // Handle object case (for type safety)
+        const ingObj = ing as { name?: string; description?: string };
+        return {
+          name: ingObj.name || `Ingredient ${idx + 1}`,
+          description: ingObj.description || '',
+        };
+      })
     : defaultIngredients;
 
   return (

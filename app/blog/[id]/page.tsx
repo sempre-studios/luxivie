@@ -98,12 +98,10 @@ The scientific evidence supporting rosemary oil for hair growth is compelling. W
 };
 
 export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const [postId, setPostId] = useState<string | null>(null);
   const [post, setPost] = useState<BlogPost | null>(null);
 
   useEffect(() => {
     params.then(({ id }) => {
-      setPostId(id);
       setPost(blogPosts[id] || null);
     });
   }, [params]);
@@ -356,24 +354,24 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
                 <h4 className="text-gray-900 mb-4">Shop</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li>
-                    <a href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
                       Hair Care
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
                       Bestsellers
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
                       Gift Sets
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
                       New Arrivals
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </motion.div>

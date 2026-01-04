@@ -63,11 +63,13 @@ const defaultRelatedProducts: Product[] = [
   },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function RelatedProducts({ currentProductId, limit = 4 }: RelatedProductsProps) {
   const router = useRouter();
   const { addToCart } = useCart();
 
   // For now, use default products. In the future, this could fetch related products from API
+  // currentProductId will be used to filter out the current product from related products
   const products = defaultRelatedProducts.slice(0, limit);
 
   const handleProductClick = (productId: string) => {

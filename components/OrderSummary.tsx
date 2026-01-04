@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 export function OrderSummary() {
     const { items, updateQuantity, removeFromCart } = useCart();
@@ -51,7 +52,7 @@ export function OrderSummary() {
                                     className="flex gap-4 items-start"
                                 >
                                     <div className="w-24 h-24 rounded-3xl overflow-hidden bg-gray-50 shrink-0">
-                                        <img
+                                        <ImageWithFallback
                                             src={item.image_url}
                                             alt={item.name}
                                             className="w-full h-full object-cover"

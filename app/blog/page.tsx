@@ -281,24 +281,24 @@ export default function BlogPage() {
                 <h4 className="text-gray-900 mb-4">Shop</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li>
-                    <a href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
                       Hair Care
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
                       Bestsellers
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
                       Gift Sets
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
                       New Arrivals
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </motion.div>
