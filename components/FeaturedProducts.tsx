@@ -7,8 +7,9 @@ import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ProductCardSkeleton } from "./ProductCardSkeleton";
 
 interface Product {
   id: string;
@@ -35,7 +36,6 @@ interface FeaturedProductsProps {
 export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { addToCart } = useCart();
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -132,9 +132,7 @@ export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
 
           {/* Products Grid */}
           {isLoading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading products...</p>
-            </div>
+            <ProductCardSkeleton count={3} variant="featured" />
           ) : (
             <div data-section-component-key="products" className="grid md:grid-cols-3 gap-8">
               {displayProducts.map((product, index) => {
@@ -201,6 +199,22 @@ export function FeaturedProducts({ content }: FeaturedProductsProps = {}) {
               })}
             </div>
           )}
+
+          {/* See All Products Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center mt-12 pt-8 pb-4"
+          >
+            <Link 
+              href="/products"
+              data-slot="button"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-background text-foreground hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 has-[>svg]:px-3 border-2 border-gray-300 hover:border-[#BFC8B3] hover:bg-white px-8 py-6 rounded-full cursor-pointer"
+            >
+              See all products
+            </Link>
+          </motion.div>
         </div>
       </div>
     </section>

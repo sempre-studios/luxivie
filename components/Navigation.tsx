@@ -63,10 +63,9 @@ export function Navigation() {
   }, [isMobileMenuOpen]);
 
   const navLinks = [
-    { name: "Shop", href: "#products" },
-    { name: "Ingredients", href: "#ingredients" },
-    { name: "Our Story", href: "#story" },
-    { name: "Reviews", href: "#reviews" },
+    { name: "Home", href: "/" },
+    { name: "All Products", href: "/products" },
+    { name: "Blog", href: "/blog" },
   ];
 
   return (

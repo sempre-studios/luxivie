@@ -8,6 +8,7 @@ import { Leaf } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProductDetailSkeleton } from "@/components/ProductDetailSkeleton";
 
 interface Product {
   id: string;
@@ -88,13 +89,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     return (
       <div className="min-h-screen bg-[#F9F9F6]">
         <Navigation />
-        <div className="pt-32 pb-16 px-4">
-          <div className="container mx-auto max-w-7xl">
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading product...</p>
-            </div>
-          </div>
-        </div>
+        <ProductDetailSkeleton />
       </div>
     );
   }
@@ -126,8 +121,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     <div className="min-h-screen bg-[#F9F9F6]">
       <Navigation />
 
+      {/* Spacer for fixed navigation */}
+      <div className="h-20"></div>
+
       {/* Main Product Container */}
-      <div className="pt-20 pb-12 md:pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="pt-12 pb-12 md:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-7xl">
           {/* Breadcrumb */}
           <motion.div
