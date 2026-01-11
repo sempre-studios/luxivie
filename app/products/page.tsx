@@ -4,10 +4,11 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
-import { Check, Leaf, ArrowRight } from "lucide-react";
+import { Check, Leaf } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 
 interface Product {
@@ -22,6 +23,7 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -129,76 +131,65 @@ export default function ProductsPage() {
                       const displayBenefits = product.benefits?.slice(0, 3) || [];
                       
                       return (
-                        <motion.article
+                        <motion.div
                           key={product.id}
                           initial={{ opacity: 0, y: 50 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.6, delay: index * 0.1 }}
-                          whileHover={{ y: -8 }}
-                          className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:border-[#BFC8B3]/30 transition-all duration-300 flex flex-col group"
+                          whileHover={!isDisabled ? { y: -10 } : {}}
+                          className="group bg-[#F9F9F6] rounded-3xl overflow-hidden hover:shadow-xl transition-all"
                         >
                           {/* Product Image */}
-                          <Link href={`/products/${product.id}`}>
-                            <div className="relative w-full h-64 overflow-hidden bg-gray-50">
+                          <div className="relative aspect-square overflow-hidden">
+                            <Link href={`/products/${product.id}`}>
                               <ImageWithFallback
                                 src={product.image_url || ""}
                                 alt={product.name || "Product"}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                               />
-                              {product.is_bestseller && (
-                                <div className="absolute top-4 right-4">
-                                  <Badge className="bg-[#BFC8B3] text-white border-0 shadow-sm">
-                                    Bestseller
-                                  </Badge>
-                                </div>
-                              )}
-                              {!product.is_bestseller && product.status === 'out of stock' && (
-                                <div className="absolute top-4 right-4">
-                                  <Badge className="bg-gray-500 text-white border-0 shadow-sm">
-                                    Out of Stock
-                                  </Badge>
-                                </div>
-                              )}
-                            </div>
-                          </Link>
+                            </Link>
+                            {product.is_bestseller && (
+                              <Badge 
+                                className="absolute top-4 right-4 bg-[#BFC8B3] text-white border-0"
+                              >
+                                Bestseller
+                              </Badge>
+                            )}
+                            {product.status === 'out of stock' && (
+                              <Badge 
+                                className={`absolute ${product.is_bestseller ? 'top-16' : 'top-4'} right-4 bg-gray-500 text-white border-0`}
+                              >
+                                Out of Stock
+                              </Badge>
+                            )}
+                          </div>
 
                           {/* Product Info */}
-                          <div className="p-6 flex-1 flex flex-col">
-                            {/* Title and Price */}
+                          <div className="p-6 space-y-4">
                             <Link href={`/products/${product.id}`}>
-                              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 group-hover:text-[#8B9A7F] transition-colors line-clamp-2 leading-tight">
-                                {product.name || ""}
-                              </h2>
+                              <h3 className="text-gray-900">{product.name || ""}</h3>
                             </Link>
-                            <p className="text-lg font-bold text-gray-900 mb-4">
-                              ${product.price.toFixed(2)}
-                            </p>
                             
-                            {/* Benefits */}
                             {displayBenefits.length > 0 && (
-                              <ul className="space-y-2 mb-5 flex-1">
-                                {displayBenefits.slice(0, 2).map((benefit, i) => (
+                              <ul className="space-y-2">
+                                {displayBenefits.map((benefit, i) => (
                                   <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
                                     <Check className="w-4 h-4 text-[#8B9A7F] shrink-0 mt-0.5" />
-                                    <span className="line-clamp-2">{benefit}</span>
+                                    <span>{benefit}</span>
                                   </li>
                                 ))}
                               </ul>
                             )}
 
-                            {/* Shop Now Button */}
-                            <Link href={`/products/${product.id}`}>
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-between group-hover:bg-[#BFC8B3]/10 text-gray-700 hover:text-[#8B9A7F] font-medium h-11 rounded-lg transition-all"
-                                disabled={isDisabled}
-                              >
-                                {isDisabled ? "Unavailable" : "Shop Now"}
-                                {!isDisabled && <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />}
-                              </Button>
-                            </Link>
+                            <Button 
+                              className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full"
+                              disabled={isDisabled}
+                              onClick={() => !isDisabled && router.push(`/products/${product.id}`)}
+                            >
+                              {isDisabled ? "Unavailable" : "Shop Now"}
+                            </Button>
                           </div>
-                        </motion.article>
+                        </motion.div>
                       );
                     })}
                   </div>
@@ -210,10 +201,10 @@ export default function ProductsPage() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-24 border-t border-gray-200 pt-12">
+      <footer className="mt-24 border-t border-gray-200 pt-12 pb-8">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
               {/* Brand */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -230,33 +221,28 @@ export default function ProductsPage() {
                 </p>
               </motion.div>
 
-              {/* Shop Links */}
+              {/* Navigation Links - Matching Navbar */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
-                <h4 className="text-gray-900 mb-4">Shop</h4>
+                <h4 className="text-gray-900 mb-4">Navigation</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Hair Care
-                    </a>
+                    <Link href="/" className="hover:text-[#8B9A7F] transition-colors">
+                      Home
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Bestsellers
-                    </a>
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                      All Products
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Gift Sets
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      New Arrivals
-                    </a>
+                    <Link href="/blog" className="hover:text-[#8B9A7F] transition-colors">
+                      Blog
+                    </Link>
                   </li>
                 </ul>
               </motion.div>

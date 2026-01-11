@@ -38,7 +38,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative aspect-square bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-lg"
+        className="relative aspect-square bg-white rounded-3xl overflow-hidden shadow-lg"
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -69,7 +69,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           <button
             key={index}
             onClick={() => setSelectedImage(index)}
-            className={`relative aspect-square bg-white rounded-lg overflow-hidden transition-all border-2 ${
+            className={`relative aspect-square bg-white rounded-3xl overflow-hidden transition-all border-2 ${
               selectedImage === index
                 ? "border-[#BFC8B3] shadow-md"
                 : "border-transparent hover:border-gray-300"

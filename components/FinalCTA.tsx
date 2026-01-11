@@ -6,6 +6,7 @@ import { Leaf, ArrowRight, Package, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import Link from "next/link";
 
 interface FinalCTAProps {
   content?: {
@@ -158,10 +159,10 @@ export function FinalCTA({ content }: FinalCTAProps = {}) {
       </div>
 
       {/* Footer */}
-      <footer className="mt-24 border-t border-gray-200 pt-12">
+      <footer className="mt-24 border-t border-gray-200 pt-12 pb-8">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
               {/* Brand */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -178,18 +179,17 @@ export function FinalCTA({ content }: FinalCTAProps = {}) {
                 </p>
               </motion.div>
 
-              {/* Shop */}
+              {/* Navigation Links - Matching Navbar */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                 transition={{ duration: 0.6, delay: 1.1 }}
               >
-                <h4 className="text-gray-900 mb-4">Shop</h4>
+                <h4 className="text-gray-900 mb-4">Navigation</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li><a href="#" className="hover:text-[#8B9A7F] transition-colors">Hair Care</a></li>
-                  <li><a href="#" className="hover:text-[#8B9A7F] transition-colors">Bestsellers</a></li>
-                  <li><a href="#" className="hover:text-[#8B9A7F] transition-colors">Gift Sets</a></li>
-                  <li><a href="#" className="hover:text-[#8B9A7F] transition-colors">New Arrivals</a></li>
+                  <li><Link href="/" className="hover:text-[#8B9A7F] transition-colors">Home</Link></li>
+                  <li><Link href="/products" className="hover:text-[#8B9A7F] transition-colors">All Products</Link></li>
+                  <li><Link href="/blog" className="hover:text-[#8B9A7F] transition-colors">Blog</Link></li>
                 </ul>
               </motion.div>
 

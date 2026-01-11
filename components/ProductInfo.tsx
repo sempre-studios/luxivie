@@ -151,7 +151,7 @@ export function ProductInfo({
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`px-4 md:px-6 py-2 md:py-3 rounded-lg border-2 transition-all text-sm md:text-base ${
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-md border-2 transition-all text-sm md:text-base ${
                   selectedSize === size
                     ? "border-[#BFC8B3] bg-[#BFC8B3]/10 text-gray-900 font-medium"
                     : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
@@ -175,7 +175,7 @@ export function ProductInfo({
         <div className="flex items-center gap-2 md:gap-3">
           <button
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-lg border-2 border-gray-200 bg-white hover:border-gray-300 transition-colors flex items-center justify-center text-lg md:text-xl"
+            className="w-12 h-9 md:w-14 md:h-10 rounded-md border-2 border-gray-200 bg-white hover:border-gray-300 transition-colors flex items-center justify-center text-lg md:text-xl"
             aria-label="Decrease quantity"
           >
             −
@@ -183,7 +183,7 @@ export function ProductInfo({
           <span className="w-10 md:w-12 text-center text-gray-900 font-medium text-sm md:text-base">{quantity}</span>
           <button
             onClick={() => setQuantity(quantity + 1)}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-lg border-2 border-gray-200 bg-white hover:border-gray-300 transition-colors flex items-center justify-center text-lg md:text-xl"
+            className="w-12 h-9 md:w-14 md:h-10 rounded-md border-2 border-gray-200 bg-white hover:border-gray-300 transition-colors flex items-center justify-center text-lg md:text-xl"
             aria-label="Increase quantity"
           >
             +

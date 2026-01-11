@@ -205,22 +205,22 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               }
             `}} />
             <Tabs defaultValue="description" className="w-full">
-              <TabsList className="w-full h-auto p-0 bg-white border-b-2 border-gray-200 rounded-none justify-start">
+              <TabsList className="w-full h-auto p-0 bg-white border-b-2 border-gray-200 rounded-md justify-start">
                 <TabsTrigger
                   value="description"
-                  className="relative px-6 py-6 md:py-7 rounded-none border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
+                  className="relative px-6 py-6 md:py-7 rounded-md border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
                 >
                   Description
                 </TabsTrigger>
                 <TabsTrigger
                   value="ingredients"
-                  className="relative px-6 py-6 md:py-7 rounded-none border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
+                  className="relative px-6 py-6 md:py-7 rounded-md border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
                 >
                   Ingredients
                 </TabsTrigger>
                 <TabsTrigger
                   value="howto"
-                  className="relative px-6 py-6 md:py-7 rounded-none border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
+                  className="relative px-6 py-6 md:py-7 rounded-md border-0 bg-transparent text-sm md:text-base transition-all duration-300 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-0"
                 >
                   How to Use
                 </TabsTrigger>
@@ -371,10 +371,10 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
       </div>
 
       {/* Footer */}
-      <footer className="mt-24 border-t border-gray-200 pt-12">
+      <footer className="mt-24 border-t border-gray-200 pt-12 pb-8">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
               {/* Brand */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -391,33 +391,28 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 </p>
               </motion.div>
 
-              {/* Shop */}
+              {/* Navigation Links - Matching Navbar */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
-                <h4 className="text-gray-900 mb-4">Shop</h4>
+                <h4 className="text-gray-900 mb-4">Navigation</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Hair Care
-                    </a>
+                    <Link href="/" className="hover:text-[#8B9A7F] transition-colors">
+                      Home
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Bestsellers
-                    </a>
+                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                      All Products
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Gift Sets
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      New Arrivals
-                    </a>
+                    <Link href="/blog" className="hover:text-[#8B9A7F] transition-colors">
+                      Blog
+                    </Link>
                   </li>
                 </ul>
               </motion.div>
