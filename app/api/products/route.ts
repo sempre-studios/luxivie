@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     // Prioritize bestsellers first, then by created_at
     const { data: products, error: productsError } = await supabaseAdmin
       .from('retail_products_table')
-      .select('id, name, price, image_url, benefits, status, is_bestseller')
+      .select('id, name, price, image_url, benefits, description, status, is_bestseller, rating, review_count, badges')
       .eq('business_id', businessId)
       .in('status', ['active', 'out of stock'])
       .order('is_bestseller', { ascending: false })
@@ -48,8 +48,14 @@ export async function GET(request: NextRequest) {
         benefits: product.benefits && Array.isArray(product.benefits) 
           ? product.benefits.slice(0, 3) 
           : [],
+        description: typeof product.description === 'string' ? product.description : '',
         status: product.status || 'active',
         is_bestseller: product.is_bestseller || false,
+        rating: product.rating != null ? parseFloat(String(product.rating)) : null,
+        review_count: Number(product.review_count) || 0,
+        badges: product.badges && Array.isArray(product.badges)
+          ? product.badges.map((b: unknown) => String(b)).filter(Boolean)
+          : [],
       }));
 
     // Add cache headers for better performance
