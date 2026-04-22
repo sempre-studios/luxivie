@@ -1,6 +1,5 @@
 "use client";
 
-import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
@@ -82,8 +81,6 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-[#F9F9F6]">
-      <Navigation />
-
       {/* Decorative botanical accent */}
       <motion.div
         initial={{ opacity: 0, rotate: -45, scale: 0.8 }}
@@ -93,9 +90,6 @@ export default function ProductsPage() {
       >
         <Leaf className="w-96 h-96 text-[#BFC8B3]" />
       </motion.div>
-
-      {/* Spacer for fixed navigation */}
-      <div className="h-20"></div>
 
       <div className="relative pt-12 pb-20 z-10">
         <div className="container mx-auto px-4">

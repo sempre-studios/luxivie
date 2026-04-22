@@ -1,6 +1,5 @@
 "use client";
 
-import { Navigation } from "@/components/Navigation";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductInfo } from "@/components/ProductInfo";
 import { motion } from "framer-motion";
@@ -101,7 +100,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F9F9F6]">
-        <Navigation />
         <ProductDetailSkeleton />
       </div>
     );
@@ -110,7 +108,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   if (error || !product) {
     return (
       <div className="min-h-screen bg-[#F9F9F6]">
-        <Navigation />
         <div className="pt-32 pb-16 px-4">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center py-12">
@@ -132,11 +129,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
   return (
     <div className="min-h-screen bg-[#F9F9F6]">
-      <Navigation />
-
-      {/* Spacer for fixed navigation */}
-      <div className="h-20"></div>
-
       {/* Main Product Container */}
       <div className="pt-12 pb-12 md:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-7xl">

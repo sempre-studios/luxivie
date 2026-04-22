@@ -92,21 +92,6 @@ export default async function BlogPage() {
         </div>
       </section>
 
-      <section id="topics" className="mb-20 px-8 lg:px-20">
-        <div className="flex flex-col items-center justify-between gap-8 border-b border-[#243027]/10 pb-8 md:flex-row">
-          <h3 className="font-serif text-3xl">Explore by Topic</h3>
-          <div className="flex flex-wrap justify-center gap-x-10 gap-y-4">
-            <button type="button" className="relative text-[10px] font-bold uppercase tracking-[0.3em] text-[#243027]">
-              All Entries
-              <span className="absolute -bottom-1 left-0 h-[2px] w-full bg-[#76885B]" />
-            </button>
-            {["Health", "Ingredients", "Rituals", "Origins"].map((topic) => (
-              <button key={topic} type="button" className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#243027]/40 transition-colors hover:text-[#76885B]">{topic}</button>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="mb-40 px-8 lg:px-20">
         <div className="grid grid-cols-1 gap-x-12 gap-y-32 md:grid-cols-2 lg:grid-cols-3">
           {list.length > 0 ? (

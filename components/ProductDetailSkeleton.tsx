@@ -3,9 +3,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function ProductDetailSkeleton() {
   return (
     <div className="min-h-screen bg-[#F9F9F6]">
-      {/* Spacer for fixed navigation */}
-      <div className="h-20"></div>
-
       <div className="pt-12 pb-12 md:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-7xl">
           {/* Breadcrumb Skeleton */}

@@ -1,6 +1,5 @@
 "use client";
 
-import { Navigation } from "@/components/Navigation";
 import { CheckoutForm } from "@/components/CheckoutForm";
 import { OrderSummary } from "@/components/OrderSummary";
 import { motion } from "framer-motion";
@@ -15,8 +14,6 @@ export default function CheckoutPage() {
 
     return (
         <div className="min-h-screen bg-[#F9F9F6]">
-            <Navigation />
-
             {/* Decorative botanical accent */}
             <motion.div
                 initial={{ opacity: 0, rotate: -45, scale: 0.8 }}
@@ -27,8 +24,8 @@ export default function CheckoutPage() {
                 <Leaf className="w-96 h-96 text-[#BFC8B3]" />
             </motion.div>
 
-            <div className="relative pt-40 pb-20">
-                <div className="container mx-auto px-4" style={{ paddingTop: '120px', paddingBottom: '20px' }}>
+            <div className="relative pb-20 pt-10">
+                <div className="container mx-auto px-4 pb-5">
                     {/* Page Title */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

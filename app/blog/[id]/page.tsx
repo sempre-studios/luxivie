@@ -1,317 +1,354 @@
-import { Navigation } from "@/components/Navigation";
-import { Badge } from "@/components/ui/badge";
-import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
-import { Leaf, Calendar, Clock, ArrowLeft, Share2 } from "lucide-react";
-import Link from "next/link";
-import { getBlogBySlug, getPublishedBlogs } from "@/lib/blogs";
+/* eslint-disable @next/next/no-img-element */
+import Link from "next/link"
+import { getBlogBySlug, getPublishedBlogs, type BlogPost } from "@/lib/blogs"
+import { LandingNav } from "@/components/luxivie-landing/LandingNav"
+
+export const dynamic = "force-dynamic"
 
 interface BlogPostPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
+}
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1596501048547-e90b7987034c?q=80&w=2070&auto=format&fit=crop"
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+}
+
+function authorInitials(author?: string) {
+  if (!author) return "LX"
+  return author
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()
+}
+
+function estimateReadTime(html: string, readTime?: string) {
+  if (readTime) return readTime
+  const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
+  const words = plain ? plain.split(" ").length : 0
+  return `${Math.max(3, Math.ceil(words / 220))} Min Read`
+}
+
+function RelatedCard({ post }: { post: BlogPost }) {
+  const img =
+    post.image_url ||
+    "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=2069&auto=format&fit=crop"
+  return (
+    <Link
+      href={`/blog/${post.slug}`}
+      className="filmstrip-card relative flex-shrink-0 snap-start group overflow-hidden rounded-[40px]"
+      style={{
+        flex: "0 0 450px",
+        height: 600,
+        boxShadow: "20px 20px 60px rgba(36,48,39,0.05),-5px -5px 30px rgba(255,255,255,0.5)",
+      }}
+    >
+      <img
+        src={img}
+        alt={post.title}
+        className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#243027]/90 via-[#243027]/20 to-transparent p-12">
+        <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.4em] text-[#76885B]">
+          {post.category || "Journal"}
+        </span>
+        <h4 className="mb-6 font-serif text-4xl text-[#F2F0EB] leading-tight">{post.title}</h4>
+        <div className="flex items-center justify-between">
+          <span className="text-[9px] font-bold uppercase tracking-widest text-[#F2F0EB]/40">
+            {estimateReadTime(post.content, post.readTime)}
+          </span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md">
+            <i className="ph ph-arrow-up-right" />
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { id } = await params;
-  
-  // Fetch blog by slug (id is actually the slug)
-  const post = await getBlogBySlug(id);
-  
-  // Also fetch all blogs for related posts
-  const allBlogs = await getPublishedBlogs();
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  // Render rich text content (HTML from Quill editor)
-  const renderContent = (content: string) => {
-    return <div dangerouslySetInnerHTML={{ __html: content }} />;
-  };
+  const { id } = await params
+  const post = await getBlogBySlug(id)
+  const allBlogs = await getPublishedBlogs()
+  const related = allBlogs.filter((p) => p.id !== post?.id).slice(0, 4)
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-[#F9F9F6]">
-        <Navigation />
-        <div className="h-20"></div>
-        <div className="pt-32 pb-16 px-4">
-          <div className="container mx-auto max-w-7xl">
-            <div className="text-center py-12">
-              <p className="text-gray-600 mb-4">Blog post not found</p>
-              <Link
-                href="/blog"
-                className="text-[#BFC8B3] hover:text-[#A8B19D] transition-colors"
-              >
-                ← Back to Blog
-              </Link>
-            </div>
-          </div>
+      <div className="m-0 min-h-screen w-full overflow-x-hidden bg-[#F2F0EB] p-0 text-[#243027]">
+        <div
+          className="pointer-events-none fixed inset-0 z-[9999] opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
+          }}
+        />
+        <LandingNav />
+        <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-8">
+          <p className="text-[#243027]/50 text-lg">Blog post not found.</p>
+          <Link href="/blog" className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#76885B] hover:underline">
+            ← Back to Journal
+          </Link>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F6]">
-      <Navigation />
+    <div className="m-0 min-h-screen w-full overflow-x-hidden bg-[#F2F0EB] p-0 text-[#243027]">
+      {/* Grain overlay */}
+      <div
+        className="pointer-events-none fixed inset-0 z-[9999] opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
+        }}
+      />
 
-      {/* Spacer for fixed navigation */}
-      <div className="h-20"></div>
+      <LandingNav />
 
-      <div className="pt-12 pb-12 md:pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="container mx-auto max-w-4xl">
-          {/* Back Button */}
-          <div className="mb-8">
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-[#8B9A7F] transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Blog</span>
-            </Link>
+      {/* ── Article Header ── */}
+      <header className="px-6 pb-20 pt-48 lg:px-24">
+        <div className="mx-auto max-w-5xl">
+          {/* Breadcrumb + status row */}
+          <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-center">
+            <nav className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-[#243027]/40">
+              <Link href="/blog" className="transition-colors hover:text-[#243027]">Journal</Link>
+              <span>/</span>
+              <span className="text-[#243027]/60">{post.category || "Article"}</span>
+            </nav>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1.5 rounded-full bg-[#76885B]/10 px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-[#76885B]">
+                <span className="h-1 w-1 rounded-full bg-[#76885B]" />
+                Published
+              </span>
+              <span className="font-mono text-[9px] text-[#243027]/30">#{post.slug}</span>
+            </div>
           </div>
 
-          {/* Article Header */}
-          <article>
-            {/* Category Badge */}
-            <div className="mb-4">
-              <Badge className="bg-[#BFC8B3] text-white border-0">
+          {/* Category pill + title */}
+          <div className="mb-12">
+            {post.category && (
+              <span className="mb-8 inline-block rounded-full bg-[#76885B] px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.4em] text-white">
                 {post.category}
-              </Badge>
-            </div>
-
-            {/* Title */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900 mb-6">
+              </span>
+            )}
+            <h1 className="mb-10 font-serif text-6xl leading-[0.9] tracking-tight md:text-8xl lg:text-[100px]">
               {post.title}
             </h1>
 
-            {/* Meta Information */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-8 pb-8 border-b border-gray-200">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>{formatDate(post.publishedAt)}</span>
-              </div>
-              {post.readTime && (
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span>{post.readTime}</span>
-              </div>
-              )}
-              {post.author && (
-              <div>
-                By <span className="font-medium text-gray-900">{post.author}</span>
-              </div>
-              )}
-              <button className="flex items-center gap-2 hover:text-[#8B9A7F] transition-colors">
-                <Share2 className="w-4 h-4" />
-                <span>Share</span>
-              </button>
-            </div>
-
-            {/* Featured Image */}
-            <div className="mb-8 rounded-xl overflow-hidden">
-              <ImageWithFallback
-                src={post.image_url}
-                alt={post.title}
-                className="w-full h-auto object-cover"
-              />
-            </div>
-
-            {/* Article Content */}
-            <div className="prose prose-lg max-w-none">
-              <div className="text-gray-700 leading-relaxed space-y-6 blog-content">
-                {renderContent(post.content)}
-              </div>
-            </div>
-
             {/* Tags */}
             {post.tags && post.tags.length > 0 && (
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-900 mb-4">Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="outline"
-                      className="border-gray-300 text-gray-700 hover:border-[#BFC8B3] hover:text-[#8B9A7F] transition-colors"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Author Bio */}
-            {post.author && (
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-[#BFC8B3] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-semibold text-xl">
-                      {post.author.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                      {post.author}
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      Expert in natural hair care and botanical ingredients. Passionate about helping people achieve healthier hair through science-backed natural solutions.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </article>
-
-          {/* Related Posts Section */}
-          <div className="mt-16 pt-12 border-t border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-8">Related Posts</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {allBlogs
-                .filter(p => p.id !== post.id && p.category === post.category)
-                .slice(0, 2)
-                .map((relatedPost) => (
-                  <Link
-                    key={relatedPost.id}
-                    href={`/blog/${relatedPost.slug}`}
-                    className="group"
+              <div className="mb-10 flex flex-wrap gap-3">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-[#243027]/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[#243027]/60"
                   >
-                    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
-                      <div className="relative h-48 overflow-hidden">
-                        <ImageWithFallback
-                          src={relatedPost.image_url || '/placeholder-blog.jpg'}
-                          alt={relatedPost.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                      <div className="p-6">
-                        {relatedPost.category && (
-                        <Badge className="bg-[#BFC8B3] text-white border-0 mb-2">
-                          {relatedPost.category}
-                        </Badge>
-                        )}
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-[#8B9A7F] transition-colors line-clamp-2">
-                          {relatedPost.title}
-                        </h3>
-                        {relatedPost.excerpt && (
-                        <p className="text-sm text-gray-600 line-clamp-2">
-                          {relatedPost.excerpt}
-                        </p>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
+                    #{tag}
+                  </span>
                 ))}
+              </div>
+            )}
+
+            {/* Excerpt pull-quote */}
+            {post.excerpt && (
+              <div className="max-w-3xl border-l-4 border-[#B08968]/20 pl-8">
+                <p className="text-2xl font-light italic leading-relaxed text-[#243027]/70">
+                  &ldquo;{post.excerpt}&rdquo;
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Author + meta row */}
+          <div className="flex flex-col justify-between gap-8 border-b border-t border-[#243027]/10 py-10 md:flex-row md:items-center">
+            <div className="flex items-center gap-5">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#243027] text-xs font-bold text-white ring-4 ring-white/50">
+                {authorInitials(post.author)}
+              </div>
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[#243027]">
+                  {post.author || "Luxivie Team"}
+                </p>
+                <p className="text-[10px] uppercase tracking-widest text-[#243027]/40">Botanical Research</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-10">
+              <div className="flex flex-col items-start md:items-end">
+                <span className="mb-1 text-[9px] font-bold uppercase tracking-[0.3em] text-[#243027]/30">Published</span>
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#243027]/70">
+                  {formatDate(post.publishedAt)}
+                </span>
+              </div>
+              <div className="flex flex-col items-start md:items-end">
+                <span className="mb-1 text-[9px] font-bold uppercase tracking-[0.3em] text-[#243027]/30">Read Time</span>
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#243027]/70">
+                  {estimateReadTime(post.content, post.readTime)}
+                </span>
+              </div>
+              {/* Share buttons */}
+              <div className="flex gap-4 border-l border-[#243027]/10 pl-10">
+                {["x-logo", "pinterest-logo", "link"].map((icon) => (
+                  <button
+                    key={icon}
+                    type="button"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
+                    aria-label={icon}
+                  >
+                    <i className={`ph ph-${icon}`} />
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Footer */}
-      <footer className="mt-24 border-t border-gray-200 pt-12 pb-8">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-              {/* Brand */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Leaf className="w-6 h-6 text-[#BFC8B3]" />
-                  <span className="text-xl text-gray-900">LUXIVIE</span>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Clean beauty crafted with care in Canada
-                </p>
+      {/* ── Hero Image ── */}
+      <section className="mb-32 px-6 lg:px-24">
+        <div className="mx-auto max-w-7xl">
+          <div
+            className="group relative aspect-[21/9] w-full overflow-hidden rounded-[40px]"
+            style={{ boxShadow: "20px 20px 60px rgba(36,48,39,0.05),-5px -5px 30px rgba(255,255,255,0.5)" }}
+          >
+            <img
+              src={post.image_url || FALLBACK_IMAGE}
+              alt={post.title}
+              className="h-full w-full scale-105 object-cover grayscale-[30%] transition-all duration-1000 group-hover:scale-100 group-hover:grayscale-0"
+            />
+            {post.category && (
+              <div className="absolute bottom-8 right-8 text-[10px] font-bold uppercase tracking-[0.4em] text-white/80 drop-shadow-lg">
+                {post.category} • Luxivie Journal
               </div>
+            )}
+          </div>
+        </div>
+      </section>
 
-              {/* Navigation Links - Matching Navbar */}
+      {/* ── Article Body ── */}
+      <section className="mb-40 px-6 lg:px-24">
+        <div className="mx-auto max-w-3xl">
+          <div
+            className="article-content"
+            style={
+              {
+                "--article-h2-font": "Playfair Display, serif",
+              } as React.CSSProperties
+            }
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </div>
+      </section>
+
+      {/* ── Related Posts Filmstrip ── */}
+      {related.length > 0 && (
+        <section className="overflow-hidden bg-[#F2F0EB] pb-12">
+          <div className="mb-10 flex items-end justify-between px-6 lg:px-24">
+            <div>
+              <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.6em] text-[#76885B]">
+                Archive Feed
+              </span>
+              <h3 className="font-serif text-5xl leading-none lg:text-7xl">
+                Related <br />
+                <span className="italic">Perspectives.</span>
+              </h3>
+            </div>
+            <div className="flex gap-4">
+              {["arrow-left", "arrow-right"].map((icon) => (
+                <button
+                  key={icon}
+                  type="button"
+                  className="flex h-14 w-14 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
+                >
+                  <i className={`ph ph-${icon} text-xl`} />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="hide-scrollbar flex snap-x snap-mandatory gap-8 overflow-x-auto px-6 py-10 lg:px-24">
+            {related.map((p) => (
+              <RelatedCard key={p.id} post={p} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Footer (matches /blog) ── */}
+      <footer className="border-t border-lux-text/5 bg-lux-background px-6 pb-12 pt-24 sm:px-12 sm:pt-32">
+        <div className="mx-auto mb-24 grid max-w-7xl grid-cols-12 gap-12 sm:mb-32">
+          <div className="col-span-12 lg:col-span-4">
+            <div className="mb-10 flex items-center">
+              <img src="/luxivie-logo.png" alt="LUXIVIE" className="h-10 w-auto sm:h-12" />
+            </div>
+            <p className="mb-10 max-w-sm leading-relaxed text-lux-text/40">
+              Small batch hair care, formulated for the conscious soul. Botanically powerful, ethically created.
+            </p>
+            <div className="flex gap-4">
+              {["instagram-logo", "pinterest-logo", "tiktok-logo"].map((icon) => (
+                <a
+                  key={icon}
+                  href="#"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-lux-text/10 transition-all hover:bg-lux-accent hover:text-white"
+                  aria-label={icon.replace("-logo", "")}
+                >
+                  <i className={`ph ph-${icon} text-xl`} aria-hidden />
+                </a>
+              ))}
+            </div>
+          </div>
+          <div className="col-span-6 lg:col-span-2">
+            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">Collection</h5>
+            <ul className="space-y-6 text-sm text-lux-text/60">
+              {["Bestsellers", "Scalp Care", "Growth Rituals", "New Arrivals"].map((t) => (
+                <li key={t}>
+                  <Link href="/products" className="transition-colors hover:text-lux-text">{t}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="col-span-6 lg:col-span-2">
+            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">Journal</h5>
+            <ul className="space-y-6 text-sm text-lux-text/60">
+              {[["Our Sourcing", "/blog"], ["Ritual Guides", "/blog"], ["Ingredients", "/blog"], ["About Us", "/blog"]].map(([label, href]) => (
+                <li key={label}>
+                  <a href={href} className="transition-colors hover:text-lux-text">{label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="col-span-12 lg:col-span-4">
+            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">Locations</h5>
+            <div className="space-y-8">
               <div>
-                <h4 className="text-gray-900 mb-4">Navigation</h4>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>
-                    <Link href="/" className="hover:text-[#8B9A7F] transition-colors">
-                      Home
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
-                      All Products
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/blog" className="hover:text-[#8B9A7F] transition-colors">
-                      Blog
-                    </Link>
-                  </li>
-                </ul>
+                <p className="mb-2 text-sm font-bold text-lux-text">Vancouver Flagship</p>
+                <p className="text-sm text-lux-text/40">1240 Robson St, BC V6E 1C1</p>
               </div>
-
-              {/* About Links */}
               <div>
-                <h4 className="text-gray-900 mb-4">About</h4>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>
-                    <a href="#story" className="hover:text-[#8B9A7F] transition-colors">
-                      Our Story
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#ingredients" className="hover:text-[#8B9A7F] transition-colors">
-                      Ingredients
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Sustainability
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#reviews" className="hover:text-[#8B9A7F] transition-colors">
-                      Reviews
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Support Links */}
-              <div>
-                <h4 className="text-gray-900 mb-4">Support</h4>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Contact Us
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      FAQs
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Shipping
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#8B9A7F] transition-colors">
-                      Returns
-                    </a>
-                  </li>
-                </ul>
+                <p className="mb-2 text-sm font-bold text-lux-text">Toronto Studio</p>
+                <p className="text-sm text-lux-text/40">181 Bay Street, ON M5J 2T3</p>
               </div>
             </div>
-
-            {/* Copyright */}
-            <div className="border-t border-gray-200 pt-8 pb-4 text-center text-sm text-gray-600">
-              <p>© 2025 Luxivie. All rights reserved. Made with care in Canada. 🍁</p>
-            </div>
+          </div>
+        </div>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border-t border-lux-text/5 pt-12 md:flex-row">
+          <p className="text-center text-[10px] font-bold uppercase tracking-widest text-lux-text/20 md:text-left">
+            © 2026 LUXIVIE BOTANICALS. FOR THE CONSCIOUS SOUL.
+          </p>
+          <div className="flex flex-wrap justify-center gap-8 text-[10px] font-bold uppercase tracking-widest text-lux-text/20 md:gap-12">
+            {["Shipping", "Returns", "Privacy"].map((t) => (
+              <a key={t} href="#" className="transition-colors hover:text-lux-text">{t}</a>
+            ))}
           </div>
         </div>
       </footer>
     </div>
-  );
+  )
 }
-
