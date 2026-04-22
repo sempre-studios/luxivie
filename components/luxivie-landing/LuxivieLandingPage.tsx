@@ -4,33 +4,12 @@ import Image from "next/image"
 import { LandingNav } from "./LandingNav"
 import { cn } from "@/components/ui/utils"
 import {
-  formatPrice,
   type LandingProduct,
 } from "@/lib/landing-products"
-
-function Stars({ className }: { className?: string }) {
-  return (
-    <div className={cn("flex gap-1 text-lux-accent", className)}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <i key={i} className="ph-fill ph-star" aria-hidden />
-      ))}
-    </div>
-  )
-}
 
 const IMG = {
   sustainable:
     "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?q=80&w=2070&auto=format&fit=crop",
-}
-
-function reviewCaption(product: LandingProduct) {
-  if (product.rating != null && product.review_count > 0) {
-    return `${product.rating.toFixed(1)} (${product.review_count.toLocaleString()} Reviews)`
-  }
-  if (product.rating != null) {
-    return `${product.rating.toFixed(1)} average rating`
-  }
-  return "Loved by the community"
 }
 
 function amazonProductLink(productName: string) {
@@ -107,7 +86,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
     <div className="m-0 h-full w-full overflow-x-hidden bg-lux-background p-0 text-lux-text scrollbar-hide">
       <LandingNav />
 
-      <section className="relative flex min-h-screen items-center px-6 pb-20 pt-28 sm:px-12 sm:pt-32">
+      <section className="relative flex min-h-screen items-center px-6 pb-20 pt-20 sm:px-12 sm:pt-28">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-20">
           <div>
             <div className="mb-8 flex items-center gap-4">

@@ -89,6 +89,15 @@ const FALLBACK_PRODUCTS: LandingProduct[] = [
   },
 ]
 
+type SupabaseLikeError = {
+  code?: string | null
+  message?: string | null
+}
+
+function isMissingBusinessesTable(error: SupabaseLikeError | null | undefined) {
+  return error?.code === "42P01" && (error?.message || "").includes("public.businesses")
+}
+
 function parseBenefits(raw: unknown): string[] {
   if (!raw) return []
   if (Array.isArray(raw)) {
@@ -123,7 +132,9 @@ export async function getLandingProducts(
       .single()
 
     if (businessError || !business) {
-      console.error("[getLandingProducts] business:", businessError)
+      if (businessError && !isMissingBusinessesTable(businessError)) {
+        console.error("[getLandingProducts] business:", businessError)
+      }
       return FALLBACK_PRODUCTS
     }
 

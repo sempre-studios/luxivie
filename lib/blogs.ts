@@ -1,5 +1,16 @@
 import { supabaseAdmin } from './supabase'
 
+type SupabaseLikeError = {
+  code?: string | null
+  message?: string | null
+  details?: string | null
+}
+
+function isExpectedDevConnectionError(error: SupabaseLikeError | null | undefined) {
+  const message = `${error?.message || ''} ${error?.details || ''}`.toLowerCase()
+  return message.includes('econnrefused') || message.includes('fetch failed')
+}
+
 export interface BlogPost {
   id: string
   title: string
@@ -15,6 +26,24 @@ export interface BlogPost {
   updatedAt?: string
 }
 
+function normalizeTags(tags: unknown): string[] | undefined {
+  if (tags == null) return undefined
+  if (Array.isArray(tags)) {
+    return tags.map((t) => String(t)).filter(Boolean)
+  }
+  return undefined
+}
+
+/**
+ * Resolve tenant id: optional env UUID bypasses slug lookup (use when slug ≠ NEXT_PUBLIC_ORG_SLUG).
+ */
+function resolveBusinessIdFromEnv(): string | undefined {
+  const raw = process.env.NEXT_PUBLIC_BUSINESS_ID?.trim()
+  if (!raw) return undefined
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  return uuid.test(raw) ? raw : undefined
+}
+
 /**
  * Get all published blogs for a business
  */
@@ -22,24 +51,34 @@ export async function getPublishedBlogs(
   businessSlug?: string
 ): Promise<BlogPost[]> {
   try {
-    const slug = businessSlug || process.env.NEXT_PUBLIC_ORG_SLUG || 'luxivie'
-    
-    // Get business by slug
-    const { data: businesses, error: businessError } = await supabaseAdmin
-      .from('businesses')
-      .select('id')
-      .eq('slug', slug)
-      .limit(1)
-      .single()
+    const slug = (businessSlug || process.env.NEXT_PUBLIC_ORG_SLUG || 'luxivie').trim()
+    const envBusinessId = resolveBusinessIdFromEnv()
 
-    if (businessError || !businesses) {
-      console.error('Error fetching business:', businessError)
-      return []
+    let businessId: string
+
+    if (envBusinessId) {
+      businessId = envBusinessId
+    } else {
+      const { data: businessRow, error: businessError } = await supabaseAdmin
+        .from('businesses')
+        .select('id')
+        .ilike('slug', slug)
+        .limit(1)
+        .maybeSingle()
+
+      if (businessError || !businessRow?.id) {
+        if (businessError && isExpectedDevConnectionError(businessError)) {
+          console.warn(
+            '[blogs] Supabase unreachable (check NEXT_PUBLIC_SUPABASE_URL; default localhost only works with `supabase start`). Optional: set NEXT_PUBLIC_BUSINESS_ID to your businesses.id UUID to skip slug lookup once the URL is correct.',
+          )
+        } else if (businessError) {
+          console.error('Error fetching business:', businessError)
+        }
+        return []
+      }
+      businessId = businessRow.id
     }
 
-    const businessId = businesses.id
-
-    // Fetch published blogs for this business
     const { data: blogs, error: blogsError } = await supabaseAdmin
       .from('blogs')
       .select('*')
@@ -52,7 +91,6 @@ export async function getPublishedBlogs(
       return []
     }
 
-    // Transform to BlogPost format
     return (blogs || []).map((blog) => ({
       id: blog.id,
       title: blog.title,
@@ -64,7 +102,7 @@ export async function getPublishedBlogs(
       publishedAt: blog.published_at || blog.created_at,
       readTime: blog.read_time || undefined,
       category: blog.category || undefined,
-      tags: blog.tags && Array.isArray(blog.tags) ? blog.tags : undefined,
+      tags: normalizeTags(blog.tags),
       updatedAt: blog.updated_at || undefined,
     }))
   } catch (error) {
@@ -81,38 +119,45 @@ export async function getBlogBySlug(
   businessSlug?: string
 ): Promise<BlogPost | null> {
   try {
-    const businessSlugValue = businessSlug || process.env.NEXT_PUBLIC_ORG_SLUG || 'luxivie'
-    
-    // Get business by slug
-    const { data: businesses, error: businessError } = await supabaseAdmin
-      .from('businesses')
-      .select('id')
-      .eq('slug', businessSlugValue)
-      .limit(1)
-      .single()
+    const businessSlugValue = (businessSlug || process.env.NEXT_PUBLIC_ORG_SLUG || 'luxivie').trim()
+    const envBusinessId = resolveBusinessIdFromEnv()
 
-    if (businessError || !businesses) {
-      console.error('Error fetching business:', businessError)
-      return null
+    let businessId: string
+
+    if (envBusinessId) {
+      businessId = envBusinessId
+    } else {
+      const { data: businessRow, error: businessError } = await supabaseAdmin
+        .from('businesses')
+        .select('id')
+        .ilike('slug', businessSlugValue)
+        .limit(1)
+        .maybeSingle()
+
+      if (businessError || !businessRow?.id) {
+        if (businessError && !isExpectedDevConnectionError(businessError)) {
+          console.error('Error fetching business:', businessError)
+        }
+        return null
+      }
+      businessId = businessRow.id
     }
 
-    const businessId = businesses.id
-
-    // Fetch blog by slug for this business
     const { data: blog, error: blogError } = await supabaseAdmin
       .from('blogs')
       .select('*')
       .eq('business_id', businessId)
       .eq('slug', slug)
       .eq('status', 'published')
-      .single()
+      .maybeSingle()
 
     if (blogError || !blog) {
-      console.error('Error fetching blog:', blogError)
+      if (blogError && !isExpectedDevConnectionError(blogError)) {
+        console.error('Error fetching blog:', blogError)
+      }
       return null
     }
 
-    // Transform to BlogPost format
     return {
       id: blog.id,
       title: blog.title,
@@ -124,7 +169,7 @@ export async function getBlogBySlug(
       publishedAt: blog.published_at || blog.created_at,
       readTime: blog.read_time || undefined,
       category: blog.category || undefined,
-      tags: blog.tags && Array.isArray(blog.tags) ? blog.tags : undefined,
+      tags: normalizeTags(blog.tags),
       updatedAt: blog.updated_at || undefined,
     }
   } catch (error) {
@@ -132,4 +177,3 @@ export async function getBlogBySlug(
     return null
   }
 }
-

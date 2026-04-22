@@ -50,7 +50,7 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css"
         />
       </head>
-      <body className="font-sans antialiased">
+      <body suppressHydrationWarning className="font-sans antialiased">
         <CartProvider>{children}</CartProvider>
       </body>
     </html>
