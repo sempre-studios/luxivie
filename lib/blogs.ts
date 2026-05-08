@@ -1,16 +1,3 @@
-import { supabaseAdmin } from './supabase'
-
-type SupabaseLikeError = {
-  code?: string | null
-  message?: string | null
-  details?: string | null
-}
-
-function isExpectedDevConnectionError(error: SupabaseLikeError | null | undefined) {
-  const message = `${error?.message || ''} ${error?.details || ''}`.toLowerCase()
-  return message.includes('econnrefused') || message.includes('fetch failed')
-}
-
 export interface BlogPost {
   id: string
   title: string
@@ -26,84 +13,63 @@ export interface BlogPost {
   updatedAt?: string
 }
 
-function normalizeTags(tags: unknown): string[] | undefined {
-  if (tags == null) return undefined
-  if (Array.isArray(tags)) {
-    return tags.map((t) => String(t)).filter(Boolean)
-  }
-  return undefined
-}
-
 /**
- * Resolve tenant id: optional env UUID bypasses slug lookup (use when slug ≠ NEXT_PUBLIC_ORG_SLUG).
+ * Get the client CMS API URL and site code from environment variables
  */
-function resolveBusinessIdFromEnv(): string | undefined {
-  const raw = process.env.NEXT_PUBLIC_BUSINESS_ID?.trim()
-  if (!raw) return undefined
-  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-  return uuid.test(raw) ? raw : undefined
+function getClientCmsConfig(): { apiUrl: string; siteCode: string } | null {
+  const apiUrl = process.env.CLIENT_CMS_API_URL?.trim()
+  const siteCode = process.env.CLIENT_CMS_SITE_CODE?.trim()
+
+  if (!apiUrl || !siteCode) {
+    console.warn('[blogs] CLIENT_CMS_API_URL or CLIENT_CMS_SITE_CODE not configured')
+    return null
+  }
+
+  return { apiUrl, siteCode }
 }
 
 /**
- * Get all published blogs for a business
+ * Get all published blogs from client CMS API
  */
 export async function getPublishedBlogs(
   businessSlug?: string
 ): Promise<BlogPost[]> {
   try {
-    const slug = (businessSlug || process.env.NEXT_PUBLIC_ORG_SLUG || 'luxivie').trim()
-    const envBusinessId = resolveBusinessIdFromEnv()
-
-    let businessId: string
-
-    if (envBusinessId) {
-      businessId = envBusinessId
-    } else {
-      const { data: businessRow, error: businessError } = await supabaseAdmin
-        .from('businesses')
-        .select('id')
-        .ilike('slug', slug)
-        .limit(1)
-        .maybeSingle()
-
-      if (businessError || !businessRow?.id) {
-        if (businessError && isExpectedDevConnectionError(businessError)) {
-          console.warn(
-            '[blogs] Supabase unreachable (check NEXT_PUBLIC_SUPABASE_URL; default localhost only works with `supabase start`). Optional: set NEXT_PUBLIC_BUSINESS_ID to your businesses.id UUID to skip slug lookup once the URL is correct.',
-          )
-        } else if (businessError) {
-          console.error('Error fetching business:', businessError)
-        }
-        return []
-      }
-      businessId = businessRow.id
-    }
-
-    const { data: blogs, error: blogsError } = await supabaseAdmin
-      .from('blogs')
-      .select('*')
-      .eq('business_id', businessId)
-      .eq('status', 'published')
-      .order('published_at', { ascending: false })
-
-    if (blogsError) {
-      console.error('Error fetching blogs:', blogsError)
+    const config = getClientCmsConfig()
+    if (!config) {
       return []
     }
 
-    return (blogs || []).map((blog) => ({
-      id: blog.id,
-      title: blog.title,
-      slug: blog.slug,
-      excerpt: blog.excerpt || undefined,
-      content: blog.content,
-      image_url: blog.image_url || undefined,
-      author: blog.author || undefined,
-      publishedAt: blog.published_at || blog.created_at,
-      readTime: blog.read_time || undefined,
-      category: blog.category || undefined,
-      tags: normalizeTags(blog.tags),
-      updatedAt: blog.updated_at || undefined,
+    const { apiUrl, siteCode } = config
+    const response = await fetch(`${apiUrl}/api/v1/websites/${siteCode}/posts`, {
+      headers: {
+        'X-API-Key': siteCode,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      console.error('[blogs] Client CMS API error:', response.status, response.statusText)
+      return []
+    }
+
+    const data = await response.json()
+    const posts = data.data || []
+
+    return posts.map((post: any) => ({
+      id: String(post.id),
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.meta_description || undefined,
+      content: post.body || '',
+      image_url: undefined,
+      author: undefined,
+      publishedAt: post.publish_at || post.created_at,
+      readTime: undefined,
+      category: undefined,
+      tags: undefined,
+      updatedAt: post.updated_at,
     }))
   } catch (error) {
     console.error('Error in getPublishedBlogs:', error)
@@ -112,65 +78,53 @@ export async function getPublishedBlogs(
 }
 
 /**
- * Get a single published blog by slug
+ * Get a single published blog by slug from client CMS API
  */
 export async function getBlogBySlug(
   slug: string,
   businessSlug?: string
 ): Promise<BlogPost | null> {
   try {
-    const businessSlugValue = (businessSlug || process.env.NEXT_PUBLIC_ORG_SLUG || 'luxivie').trim()
-    const envBusinessId = resolveBusinessIdFromEnv()
-
-    let businessId: string
-
-    if (envBusinessId) {
-      businessId = envBusinessId
-    } else {
-      const { data: businessRow, error: businessError } = await supabaseAdmin
-        .from('businesses')
-        .select('id')
-        .ilike('slug', businessSlugValue)
-        .limit(1)
-        .maybeSingle()
-
-      if (businessError || !businessRow?.id) {
-        if (businessError && !isExpectedDevConnectionError(businessError)) {
-          console.error('Error fetching business:', businessError)
-        }
-        return null
-      }
-      businessId = businessRow.id
+    const config = getClientCmsConfig()
+    if (!config) {
+      return null
     }
 
-    const { data: blog, error: blogError } = await supabaseAdmin
-      .from('blogs')
-      .select('*')
-      .eq('business_id', businessId)
-      .eq('slug', slug)
-      .eq('status', 'published')
-      .maybeSingle()
+    const { apiUrl, siteCode } = config
+    const response = await fetch(`${apiUrl}/api/v1/websites/${siteCode}/posts`, {
+      headers: {
+        'X-API-Key': siteCode,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    })
 
-    if (blogError || !blog) {
-      if (blogError && !isExpectedDevConnectionError(blogError)) {
-        console.error('Error fetching blog:', blogError)
-      }
+    if (!response.ok) {
+      console.error('[blogs] Client CMS API error:', response.status, response.statusText)
+      return null
+    }
+
+    const data = await response.json()
+    const posts = data.data || []
+    const post = posts.find((p: any) => p.slug === slug)
+
+    if (!post) {
       return null
     }
 
     return {
-      id: blog.id,
-      title: blog.title,
-      slug: blog.slug,
-      excerpt: blog.excerpt || undefined,
-      content: blog.content,
-      image_url: blog.image_url || undefined,
-      author: blog.author || undefined,
-      publishedAt: blog.published_at || blog.created_at,
-      readTime: blog.read_time || undefined,
-      category: blog.category || undefined,
-      tags: normalizeTags(blog.tags),
-      updatedAt: blog.updated_at || undefined,
+      id: String(post.id),
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.meta_description || undefined,
+      content: post.body || '',
+      image_url: undefined,
+      author: undefined,
+      publishedAt: post.publish_at || post.created_at,
+      readTime: undefined,
+      category: undefined,
+      tags: undefined,
+      updatedAt: post.updated_at,
     }
   } catch (error) {
     console.error('Error in getBlogBySlug:', error)

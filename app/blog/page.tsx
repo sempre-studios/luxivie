@@ -64,34 +64,6 @@ export default async function BlogPage() {
         </div>
       </header>
 
-      <section className="px-8 py-24 lg:px-20">
-        <div className="grid grid-cols-1 items-stretch gap-0 overflow-hidden rounded-sm bg-white shadow-[20px_20px_60px_rgba(36,48,39,0.05),-5px_-5px_30px_rgba(255,255,255,0.5)] lg:grid-cols-12">
-          <div className="relative h-[600px] overflow-hidden lg:col-span-7 lg:h-auto">
-            <img src={featured?.image_url || FALLBACK_IMAGE} className="h-full w-full object-cover transition-transform duration-1000 hover:scale-105" alt={featured?.title || "Featured Image"} />
-            <div className="absolute left-8 top-8 bg-white/90 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.3em] backdrop-blur">Cover Story</div>
-          </div>
-          <div className="flex flex-col justify-center border-l border-[#243027]/5 p-12 lg:col-span-5 lg:p-20">
-            <span className="mb-6 block text-[10px] font-bold uppercase tracking-[0.4em] text-[#76885B]">{featured?.category || "Ingredient Spotlight"}</span>
-            <h2 className="mb-8 font-serif text-4xl leading-tight lg:text-5xl">{featured?.title || "The Silent Power of Wild Rosemary"}</h2>
-            <p className="mb-10 text-lg leading-relaxed text-[#243027]/70">{featured?.excerpt || "More than a kitchen staple, wild rosemary holds the key to cellular scalp regeneration. We trace its lineage from the cliffs of the Mediterranean to our laboratory."}</p>
-            <div className="mb-12 space-y-6">
-              {(featured?.tags?.slice(0, 2) || ["Molecular stimulation of the hair bulb.", "Antioxidant barriers against urban pollutants."]).map((tag, idx) => (
-                <div className="flex items-start gap-4" key={tag}>
-                  <span className="font-serif text-2xl italic text-[#76885B]">{String(idx + 1).padStart(2, "0")}.</span>
-                  <p className="text-sm text-[#243027]/60">{tag}</p>
-                </div>
-              ))}
-            </div>
-            <Link href={featured ? `/blog/${featured.slug}` : "/blog"} className="group inline-flex items-center gap-4">
-              <span className="text-[11px] font-bold uppercase tracking-[0.3em] transition-colors group-hover:text-[#76885B]">Read the Full Thesis</span>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#243027]/10 transition-all group-hover:border-[#76885B] group-hover:bg-[#76885B] group-hover:text-white">
-                <i className="ph ph-arrow-right" />
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <section className="mb-40 px-8 lg:px-20">
         <div className="grid grid-cols-1 gap-x-12 gap-y-32 md:grid-cols-2 lg:grid-cols-3">
           {list.length > 0 ? (
