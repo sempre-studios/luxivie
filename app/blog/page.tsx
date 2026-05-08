@@ -22,8 +22,7 @@ function estimateReadTime(html: string, readTime?: string) {
 }
 
 export default async function BlogPage() {
-  const businessSlug = process.env.NEXT_PUBLIC_ORG_SLUG || "luxivie"
-  const posts = await getPublishedBlogs(businessSlug)
+  const posts = await getPublishedBlogs()
   const list = posts.slice(0, 7)
   const heroText =
     posts[0]?.excerpt ||
