@@ -21,6 +21,11 @@ function estimateReadTime(html: string, readTime?: string) {
   return `${Math.max(3, Math.ceil(words / 220))} Min Read`
 }
 
+function extractFirstImageFromContent(html: string): string | undefined {
+  const imgMatch = html.match(/<img[^>]+src=["']([^"']+)["']/i)
+  return imgMatch ? imgMatch[1] : undefined
+}
+
 export default async function BlogPage() {
   const posts = await getPublishedBlogs()
   const list = posts.slice(0, 7)
@@ -74,7 +79,7 @@ export default async function BlogPage() {
                   className={`${isWide ? "lg:col-span-2 mt-12" : idx === 1 ? "lg:mt-24" : ""} group cursor-pointer transition-transform duration-300 hover:-translate-y-2`}
                 >
                   <div className={`${isWide ? "aspect-[16/9]" : "aspect-[3/4]"} relative mb-10 overflow-hidden bg-[#243027]/5`}>
-                    <img src={post.image_url || FALLBACK_IMAGE} className="h-full w-full object-cover grayscale transition-all duration-700 hover:grayscale-0" alt={post.title} />
+                    <img src={extractFirstImageFromContent(post.content) || post.image_url || FALLBACK_IMAGE} className="h-full w-full object-cover grayscale transition-all duration-700 hover:grayscale-0" alt={post.title} />
                     {!isWide ? (
                       <div className="absolute bottom-6 right-6 text-[9px] font-bold uppercase tracking-[0.4em] text-white/80 transition-colors [writing-mode:vertical-rl] group-hover:text-white">
                         {post.category || "Volume VI"}
