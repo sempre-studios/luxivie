@@ -37,10 +37,13 @@ export async function getPublishedBlogs(
   try {
     const config = getClientCmsConfig()
     if (!config) {
+      console.warn('[blogs] CLIENT_CMS_API_URL or CLIENT_CMS_SITE_CODE not configured')
       return []
     }
 
     const { apiUrl, siteCode } = config
+    console.log('[blogs] Fetching from:', `${apiUrl}/api/v1/websites/${siteCode}/posts`)
+    
     const response = await fetch(`${apiUrl}/api/v1/websites/${siteCode}/posts`, {
       headers: {
         'X-API-Key': siteCode,
@@ -49,13 +52,17 @@ export async function getPublishedBlogs(
       cache: 'no-store',
     })
 
+    console.log('[blogs] Response status:', response.status)
+
     if (!response.ok) {
       console.error('[blogs] Client CMS API error:', response.status, response.statusText)
       return []
     }
 
     const data = await response.json()
+    console.log('[blogs] Response data:', data)
     const posts = data.data || []
+    console.log('[blogs] Number of posts:', posts.length)
 
     return posts.map((post: any) => ({
       id: String(post.id),
@@ -87,10 +94,13 @@ export async function getBlogBySlug(
   try {
     const config = getClientCmsConfig()
     if (!config) {
+      console.warn('[blogs] CLIENT_CMS_API_URL or CLIENT_CMS_SITE_CODE not configured')
       return null
     }
 
     const { apiUrl, siteCode } = config
+    console.log('[blogs] Fetching single post from:', `${apiUrl}/api/v1/websites/${siteCode}/posts`)
+    
     const response = await fetch(`${apiUrl}/api/v1/websites/${siteCode}/posts`, {
       headers: {
         'X-API-Key': siteCode,
@@ -99,18 +109,24 @@ export async function getBlogBySlug(
       cache: 'no-store',
     })
 
+    console.log('[blogs] Response status:', response.status)
+
     if (!response.ok) {
       console.error('[blogs] Client CMS API error:', response.status, response.statusText)
       return null
     }
 
     const data = await response.json()
+    console.log('[blogs] Response data:', data)
     const posts = data.data || []
     const post = posts.find((p: any) => p.slug === slug)
 
     if (!post) {
+      console.log('[blogs] Post not found with slug:', slug)
       return null
     }
+
+    console.log('[blogs] Found post:', post.title)
 
     return {
       id: String(post.id),

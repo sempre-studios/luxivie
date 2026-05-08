@@ -24,10 +24,9 @@ function estimateReadTime(html: string, readTime?: string) {
 export default async function BlogPage() {
   const businessSlug = process.env.NEXT_PUBLIC_ORG_SLUG || "luxivie"
   const posts = await getPublishedBlogs(businessSlug)
-  const featured = posts[0]
-  const list = posts.slice(1, 7)
+  const list = posts.slice(0, 7)
   const heroText =
-    featured?.excerpt ||
+    posts[0]?.excerpt ||
     "Nature never hurries, yet everything is accomplished. Our journal explores the slow philosophy of botanical beauty."
 
   return (
@@ -58,7 +57,7 @@ export default async function BlogPage() {
             <div className="flex items-center gap-4">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">Issue No. 04</span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">•</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#76885B]">{featured ? formatDate(featured.publishedAt) : "Winter 2025"}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#76885B]">{posts[0] ? formatDate(posts[0].publishedAt) : "Winter 2025"}</span>
             </div>
           </div>
         </div>

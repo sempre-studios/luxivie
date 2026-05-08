@@ -157,15 +157,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 ))}
               </div>
             )}
-
-            {/* Excerpt pull-quote */}
-            {post.excerpt && (
-              <div className="max-w-3xl border-l-4 border-[#B08968]/20 pl-8">
-                <p className="text-2xl font-light italic leading-relaxed text-[#243027]/70">
-                  &ldquo;{post.excerpt}&rdquo;
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Author + meta row */}
@@ -212,30 +203,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       </header>
 
-      {/* ── Hero Image ── */}
-      <section className="mb-32 px-6 lg:px-24">
-        <div className="mx-auto max-w-7xl">
-          <div
-            className="group relative aspect-[21/9] w-full overflow-hidden rounded-[40px]"
-            style={{ boxShadow: "20px 20px 60px rgba(36,48,39,0.05),-5px -5px 30px rgba(255,255,255,0.5)" }}
-          >
-            <img
-              src={post.image_url || FALLBACK_IMAGE}
-              alt={post.title}
-              className="h-full w-full scale-105 object-cover grayscale-[30%] transition-all duration-1000 group-hover:scale-100 group-hover:grayscale-0"
-            />
-            {post.category && (
-              <div className="absolute bottom-8 right-8 text-[10px] font-bold uppercase tracking-[0.4em] text-white/80 drop-shadow-lg">
-                {post.category} • Luxivie Journal
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
       {/* ── Article Body ── */}
       <section className="mb-40 px-6 lg:px-24">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl">
           <div
             className="article-content"
             style={
