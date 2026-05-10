@@ -1,13 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getPublishedBlogs } from '@/lib/blogs'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url)
-    const businessSlug =
-      searchParams.get('businessSlug') || process.env.NEXT_PUBLIC_ORG_SLUG || 'luxivie'
-
-    const transformedBlogs = await getPublishedBlogs(businessSlug)
+    const transformedBlogs = await getPublishedBlogs()
 
     return NextResponse.json(
       { blogs: transformedBlogs },

@@ -9,9 +9,6 @@ interface BlogPostPageProps {
   params: Promise<{ id: string }>
 }
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1596501048547-e90b7987034c?q=80&w=2070&auto=format&fit=crop"
-
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",

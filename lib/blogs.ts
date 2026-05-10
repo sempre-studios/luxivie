@@ -13,6 +13,17 @@ export interface BlogPost {
   updatedAt?: string
 }
 
+interface ApiPost {
+  id: number | string
+  title: string
+  slug: string
+  meta_description?: string
+  body?: string
+  publish_at?: string
+  created_at?: string
+  updated_at?: string
+}
+
 /**
  * Get the client CMS API URL and site code from environment variables
  */
@@ -55,7 +66,7 @@ export async function getPublishedBlogs(): Promise<BlogPost[]> {
     const data = await response.json()
     const posts = data.data || []
 
-    return posts.map((post: any) => ({
+    return posts.map((post: ApiPost) => ({
       id: String(post.id),
       title: post.title,
       slug: post.slug,
@@ -103,7 +114,7 @@ export async function getBlogBySlug(
 
     const data = await response.json()
     const posts = data.data || []
-    const post = posts.find((p: any) => p.slug === slug)
+    const post = posts.find((p: ApiPost) => p.slug === slug)
 
     if (!post) {
       return null
