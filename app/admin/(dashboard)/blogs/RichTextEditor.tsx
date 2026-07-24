@@ -11,9 +11,9 @@ import {
   ListOrdered,
   Quote,
   Image as ImageIcon,
-  Code,
   Undo2,
   Redo2,
+  X,
 } from 'lucide-react'
 import { LinkPopover } from './LinkPopover'
 import { ProductWidgetPopover } from './ProductWidgetPopover'
@@ -26,10 +26,12 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<HTMLDivElement>(null)
   const isInternalChange = useRef(false)
   const savedImageRangeRef = useRef<Range | null>(null)
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false)
+  const [hoveredWidget, setHoveredWidget] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
     if (editorRef.current && !isInternalChange.current) {
@@ -39,6 +41,31 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     }
     isInternalChange.current = false
   }, [value])
+
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!editor) return
+
+    function onMouseOver(e: MouseEvent) {
+      const widget = (e.target as HTMLElement).closest('.product-widget') as HTMLElement | null
+      if (widget) setHoveredWidget(widget)
+    }
+    function onMouseOut(e: MouseEvent) {
+      const widget = (e.target as HTMLElement).closest('.product-widget') as HTMLElement | null
+      const related = (e.relatedTarget as HTMLElement | null)?.closest?.('.product-widget, .product-widget-overlay') as HTMLElement | null
+      const isOverlay = related?.classList.contains('product-widget-overlay')
+      if (widget && related !== widget && !isOverlay) {
+        setHoveredWidget((current) => (current === widget ? null : current))
+      }
+    }
+
+    editor.addEventListener('mouseover', onMouseOver)
+    editor.addEventListener('mouseout', onMouseOut)
+    return () => {
+      editor.removeEventListener('mouseover', onMouseOver)
+      editor.removeEventListener('mouseout', onMouseOut)
+    }
+  }, [])
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
@@ -88,6 +115,19 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     }
   }
 
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement
+    const widget = target.closest('.product-widget')
+    if (widget) {
+      e.preventDefault()
+      e.stopPropagation()
+      if (target.closest('.product-widget-remove') && editorRef.current) {
+        widget.remove()
+        handleInput()
+      }
+    }
+  }
+
   const toolbarBtn = (onClick: () => void, icon: React.ReactNode, label: string) => (
     <button
       type="button"
@@ -103,7 +143,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   const divider = <div className="mx-1 h-5 w-px bg-[#243027]/10" />
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-[#243027]/15 bg-white">
+    <div ref={wrapperRef} className="relative flex flex-1 flex-col overflow-hidden rounded-lg border border-[#243027]/15 bg-white">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 border-b border-[#243027]/10 bg-[#F8F7F4] px-2 py-1.5">
         {toolbarBtn(() => exec('undo'), <Undo2 className="h-4 w-4" />, 'Undo')}
@@ -124,7 +164,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         <LinkPopover editorRef={editorRef} onChange={handleInput} />
         {toolbarBtn(handleImageClick, <ImageIcon className="h-4 w-4" />, 'Image')}
         <ProductWidgetPopover editorRef={editorRef} onChange={handleInput} />
-        {toolbarBtn(() => exec('removeFormat'), <Code className="h-4 w-4" />, 'Clear Formatting')}
       </div>
 
       {/* Editable area */}
@@ -134,9 +173,38 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         suppressContentEditableWarning
         onInput={handleInput}
         onKeyDown={handleKeyDown}
+        onClick={handleClick}
         data-placeholder={placeholder}
         className="rich-text-editor min-h-[calc(100vh-380px)] flex-1 overflow-y-auto px-6 py-4 font-serif text-[15px] leading-relaxed text-[#243027] outline-none"
       />
+
+      {hoveredWidget && wrapperRef.current && (
+        (() => {
+          const widgetRect = hoveredWidget.getBoundingClientRect()
+          const wrapperRect = wrapperRef.current.getBoundingClientRect()
+          return (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                hoveredWidget.remove()
+                setHoveredWidget(null)
+                handleInput()
+              }}
+              onMouseLeave={() => setHoveredWidget(null)}
+              style={{
+                position: 'absolute',
+                top: widgetRect.top - wrapperRect.top + 8,
+                right: wrapperRect.right - widgetRect.right + 8,
+              }}
+              className="product-widget-overlay flex h-7 w-7 items-center justify-center rounded-full bg-[#243027] text-white shadow-lg transition-colors hover:bg-[#76885B]"
+              aria-label="Remove product widget"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )
+        })()
+      )}
 
       <MediaPicker
         open={mediaPickerOpen}
@@ -190,6 +258,9 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           height: auto;
           border-radius: 8px;
           margin: 0.75rem 0;
+        }
+        .rich-text-editor :global(.product-widget:hover .product-widget-remove) {
+          display: flex !important;
         }
         .rich-text-editor :global(strong) {
           font-weight: 700;
