@@ -122,7 +122,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
             </div>
           </div>
 
-          <div className="relative flex justify-center lg:justify-end">
+          <div className="relative hidden md:flex md:justify-center lg:justify-end">
             <div className="organic-shape absolute right-0 top-1/2 -z-10 h-[90%] w-[110%] -translate-y-1/2 bg-lux-mist opacity-60" />
             <div className="relative flex items-end gap-6 sm:gap-8">
               <div className="product-image-container mb-12 h-80 w-52 border-4 border-white bg-neutral-200 sm:h-96 sm:w-64">

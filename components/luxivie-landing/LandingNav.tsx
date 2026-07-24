@@ -116,10 +116,10 @@ export function LandingNav() {
             </>
           ) : (
             <Link
-              href="/"
+              href="/blog"
               className="rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
             >
-              Home
+              Journal
             </Link>
           )}
         </div>
@@ -177,11 +177,11 @@ export function LandingNav() {
               </>
             ) : (
               <Link
-                href="/"
+                href="/blog"
                 className="inline-flex w-fit rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
                 onClick={closeMenu}
               >
-                Home
+                Journal
               </Link>
             )}
           </div>
