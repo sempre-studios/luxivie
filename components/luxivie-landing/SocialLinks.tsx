@@ -3,9 +3,10 @@ import { SOCIAL_NETWORKS } from '@/lib/social'
 
 interface SocialLinksProps {
   visibility?: Record<string, boolean> | null
+  className?: string
 }
 
-export async function SocialLinks({ visibility }: SocialLinksProps) {
+export async function SocialLinks({ visibility, className }: SocialLinksProps) {
   const { socialLinks } = await getBusinessSettings()
   const icons: Record<string, string> = {
     instagram: 'ph-instagram-logo',
@@ -24,7 +25,7 @@ export async function SocialLinks({ visibility }: SocialLinksProps) {
   if (visibleLinks.length === 0) return null
 
   return (
-    <div className="flex gap-4">
+    <div className={className ?? "flex gap-4"}>
       {visibleLinks.map(({ key, label }) => (
         <a
           key={key}

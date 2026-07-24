@@ -177,8 +177,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       </section>
 
       <footer className="border-t border-lux-text/5 bg-lux-background px-6 pb-12 pt-24 sm:px-12 sm:pt-32">
-        <div className="mx-auto mb-24 grid max-w-7xl grid-cols-12 gap-12 sm:mb-32">
-          <div className="col-span-12 lg:col-span-4">
+        <div className="mx-auto mb-24 flex max-w-7xl flex-col justify-between gap-12 sm:mb-32 lg:flex-row lg:items-start">
+          <div className="max-w-sm">
             <div className="mb-10 flex items-center">
               <img
                 src="/luxivie-logo.png"
@@ -190,68 +190,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               Small batch hair care, formulated for the conscious soul.
               Botanically powerful, ethically created.
             </p>
-            <SocialLinks />
           </div>
-          <div className="col-span-6 lg:col-span-2">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Collection
-            </h5>
-            <ul className="space-y-6 text-sm text-lux-text/60">
-              {["Bestsellers", "Scalp Care", "Growth Rituals", "New Arrivals"].map(
-                (t) => (
-                  <li key={t}>
-                    <Link
-                      href="/products"
-                      className="transition-colors hover:text-lux-text"
-                    >
-                      {t}
-                    </Link>
-                  </li>
-                ),
-              )}
-            </ul>
-          </div>
-          <div className="col-span-6 lg:col-span-2">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Journal
-            </h5>
-            <ul className="space-y-6 text-sm text-lux-text/60">
-              {[
-                ["Our Sourcing", "/blog"],
-                ["Ritual Guides", "/blog"],
-                ["Ingredients", "/blog"],
-                ["About Us", "/blog"],
-              ].map(([label, href]) => (
-                <li key={label}>
-                  <Link href={href} className="transition-colors hover:text-lux-text">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="col-span-12 lg:col-span-4">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Locations
-            </h5>
-            <div className="space-y-8">
-              <div>
-                <p className="mb-2 text-sm font-bold text-lux-text">
-                  Vancouver Flagship
-                </p>
-                <p className="text-sm text-lux-text/40">
-                  1240 Robson St, BC V6E 1C1
-                </p>
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-bold text-lux-text">
-                  Toronto Studio
-                </p>
-                <p className="text-sm text-lux-text/40">
-                  181 Bay Street, ON M5J 2T3
-                </p>
-              </div>
-            </div>
+          <div className="lg:ml-auto">
+            <SocialLinks className="flex justify-start gap-4 lg:justify-end" />
           </div>
         </div>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border-t border-lux-text/5 pt-12 md:flex-row">
