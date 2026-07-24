@@ -24,8 +24,7 @@ export function BlogList({ posts: initialPosts }: BlogListProps) {
     const checkForUpdates = async () => {
       if (!mounted) return;
       try {
-        const businessSlug = process.env.NEXT_PUBLIC_ORG_SLUG || 'luxivie';
-        const response = await fetch(`/api/blogs?businessSlug=${businessSlug}`, {
+        const response = await fetch(`/api/blogs`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -90,7 +89,8 @@ export function BlogList({ posts: initialPosts }: BlogListProps) {
     };
   }, []); // Only run once on mount
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '—';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       year: 'numeric', 

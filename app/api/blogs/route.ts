@@ -3,10 +3,10 @@ import { getPublishedBlogs } from '@/lib/blogs'
 
 export async function GET() {
   try {
-    const transformedBlogs = await getPublishedBlogs()
+    const blogs = await getPublishedBlogs()
 
     return NextResponse.json(
-      { blogs: transformedBlogs },
+      { blogs },
       {
         headers: {
           'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',

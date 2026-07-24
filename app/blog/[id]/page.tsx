@@ -1,7 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link"
+import type { Metadata } from "next"
 import { getBlogBySlug, getPublishedBlogs, type BlogPost } from "@/lib/blogs"
 import { LandingNav } from "@/components/luxivie-landing/LandingNav"
+import { SocialLinks } from "@/components/luxivie-landing/SocialLinks"
 
 export const dynamic = "force-dynamic"
 
@@ -9,7 +11,18 @@ interface BlogPostPageProps {
   params: Promise<{ id: string }>
 }
 
-function formatDate(dateString: string) {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const post = await getBlogBySlug(id)
+  if (!post) return { title: 'Journal' }
+  return {
+    title: post.seoTitle || post.title,
+    description: post.seoDescription || post.excerpt || undefined,
+  }
+}
+
+function formatDate(dateString?: string) {
+  if (!dateString) return "—"
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -112,7 +125,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <LandingNav />
 
       {/* ── Article Header ── */}
-      <header className="px-6 pb-20 pt-48 lg:px-24">
+      <header className="px-6 pb-12 pt-48 lg:px-24">
         <div className="mx-auto max-w-5xl">
           {/* Breadcrumb + status row */}
           <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -184,21 +197,54 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </div>
               {/* Share buttons */}
               <div className="flex gap-4 border-l border-[#243027]/10 pl-10">
-                {["x-logo", "pinterest-logo", "link"].map((icon) => (
-                  <button
-                    key={icon}
-                    type="button"
+                {post.socialVisibility?.x !== false && (
+                  <a
+                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://luxivie.com/blog/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
-                    aria-label={icon}
+                    aria-label="Share on X"
                   >
-                    <i className={`ph ph-${icon}`} />
-                  </button>
-                ))}
+                    <i className="ph ph-x-logo" />
+                  </a>
+                )}
+                {post.socialVisibility?.pinterest !== false && (
+                  <a
+                    href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(`https://luxivie.com/blog/${post.slug}`)}&description=${encodeURIComponent(post.title)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
+                    aria-label="Share on Pinterest"
+                  >
+                    <i className="ph ph-pinterest-logo" />
+                  </a>
+                )}
+                {post.socialVisibility?.email !== false && (
+                  <a
+                    href={`mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`https://luxivie.com/blog/${post.slug}`)}`}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
+                    aria-label="Share by email"
+                  >
+                    <i className="ph ph-link" />
+                  </a>
+                )}
               </div>
             </div>
           </div>
         </div>
       </header>
+
+      <div className="px-6 pb-12 lg:px-24">
+        <div className="mx-auto max-w-5xl">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#76885B] transition-colors hover:text-[#243027]"
+          >
+            <i className="ph ph-arrow-left" />
+            Back to Journal
+          </Link>
+        </div>
+      </div>
 
       {/* ── Article Body ── */}
       <section className="mb-40 px-6 lg:px-24">
@@ -258,18 +304,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <p className="mb-10 max-w-sm leading-relaxed text-lux-text/40">
               Small batch hair care, formulated for the conscious soul. Botanically powerful, ethically created.
             </p>
-            <div className="flex gap-4">
-              {["instagram-logo", "pinterest-logo", "tiktok-logo"].map((icon) => (
-                <a
-                  key={icon}
-                  href="#"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-lux-text/10 transition-all hover:bg-lux-accent hover:text-white"
-                  aria-label={icon.replace("-logo", "")}
-                >
-                  <i className={`ph ph-${icon} text-xl`} aria-hidden />
-                </a>
-              ))}
-            </div>
+            <SocialLinks visibility={post.socialVisibility} />
           </div>
           <div className="col-span-6 lg:col-span-2">
             <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">Collection</h5>

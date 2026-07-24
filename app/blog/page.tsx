@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic"
 
 import Link from "next/link"
 import { LandingNav } from "@/components/luxivie-landing/LandingNav"
+import { SocialLinks } from "@/components/luxivie-landing/SocialLinks"
 import { getPublishedBlogs } from "@/lib/blogs"
 
 const FALLBACK_IMAGE =
@@ -26,9 +27,16 @@ function extractFirstImageFromContent(html: string): string | undefined {
   return imgMatch ? imgMatch[1] : undefined
 }
 
-export default async function BlogPage() {
+interface BlogPageProps {
+  searchParams: Promise<{ category?: string }>
+}
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const { category } = await searchParams
   const posts = await getPublishedBlogs()
-  const list = posts.slice(0, 7)
+  const categories = [...new Set(posts.map((p) => p.category).filter(Boolean))]
+  const filteredPosts = category ? posts.filter((p) => p.category === category) : posts
+  const list = filteredPosts.slice(0, 7)
   const heroText =
     posts[0]?.excerpt ||
     "Nature never hurries, yet everything is accomplished. Our journal explores the slow philosophy of botanical beauty."
@@ -68,6 +76,34 @@ export default async function BlogPage() {
       </header>
 
       <section className="mb-40 px-8 lg:px-20">
+        {categories.length > 0 && (
+          <div className="mb-12 flex flex-wrap items-center gap-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">Filter:</span>
+            <Link
+              href="/blog"
+              className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                !category
+                  ? 'border-[#76885B] bg-[#76885B] text-white'
+                  : 'border-[#243027]/10 text-[#243027]/60 hover:border-[#76885B] hover:text-[#76885B]'
+              }`}
+            >
+              All
+            </Link>
+            {categories.map((c) => (
+              <Link
+                key={c}
+                href={`/blog?category=${encodeURIComponent(c as string)}`}
+                className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                  category === c
+                    ? 'border-[#76885B] bg-[#76885B] text-white'
+                    : 'border-[#243027]/10 text-[#243027]/60 hover:border-[#76885B] hover:text-[#76885B]'
+                }`}
+              >
+                {c}
+              </Link>
+            ))}
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-x-12 gap-y-32 md:grid-cols-2 lg:grid-cols-3">
           {list.length > 0 ? (
             list.map((post, idx) => {
@@ -154,18 +190,7 @@ export default async function BlogPage() {
               Small batch hair care, formulated for the conscious soul.
               Botanically powerful, ethically created.
             </p>
-            <div className="flex gap-4">
-              {["instagram-logo", "pinterest-logo", "tiktok-logo"].map((icon) => (
-                <a
-                  key={icon}
-                  href="#"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-lux-text/10 transition-all hover:bg-lux-accent hover:text-white"
-                  aria-label={icon.replace("-logo", "")}
-                >
-                  <i className={`ph ph-${icon} text-xl`} aria-hidden />
-                </a>
-              ))}
-            </div>
+            <SocialLinks />
           </div>
           <div className="col-span-6 lg:col-span-2">
             <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
