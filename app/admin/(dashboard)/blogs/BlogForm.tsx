@@ -356,7 +356,7 @@ export function BlogForm({ post, mode }: BlogFormProps) {
               <SelectTrigger className="rounded-lg border-[#243027]/15 bg-white px-4 py-2.5">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="published">Published</SelectItem>
                 <SelectItem value="scheduled">Scheduled</SelectItem>
