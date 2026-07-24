@@ -39,6 +39,7 @@ export function LinkPopover({ editorRef, onChange }: LinkPopoverProps) {
   const [validationError, setValidationError] = useState('')
   const [existingAnchor, setExistingAnchor] = useState<HTMLAnchorElement | null>(null)
   const savedRangeRef = useRef<Range | null>(null)
+  const existingAnchorRef = useRef<HTMLAnchorElement | null>(null)
 
   useEffect(() => {
     if (!open || articleOptions.length > 0 || loadingArticles) return
@@ -70,15 +71,19 @@ export function LinkPopover({ editorRef, onChange }: LinkPopoverProps) {
     return null
   }
 
+  function captureSelection(e: React.MouseEvent) {
+    e.preventDefault()
+    const sel = window.getSelection()
+    savedRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null
+    existingAnchorRef.current = findAnchor(sel)
+  }
+
   function openLinkModal(e: React.MouseEvent) {
     e.preventDefault()
     const editor = editorRef.current
     if (!editor) return
 
-    const sel = window.getSelection()
-    savedRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null
-
-    const anchor = findAnchor(sel)
+    const anchor = existingAnchorRef.current
     setExistingAnchor(anchor)
 
     if (anchor) {
@@ -102,7 +107,7 @@ export function LinkPopover({ editorRef, onChange }: LinkPopoverProps) {
       }
     } else {
       setMode('article')
-      setText(sel ? sel.toString() : '')
+      setText(savedRangeRef.current ? savedRangeRef.current.toString() : '')
       setArticleSlug('')
       setSectionId('')
       setExternalUrl('')
@@ -160,8 +165,7 @@ export function LinkPopover({ editorRef, onChange }: LinkPopoverProps) {
     return url
   }
 
-  function apply(e: React.FormEvent) {
-    e.preventDefault()
+  function apply() {
     const editor = editorRef.current
     if (!editor) return
 
@@ -174,29 +178,19 @@ export function LinkPopover({ editorRef, onChange }: LinkPopoverProps) {
       return
     }
 
+    const a = document.createElement('a')
+    a.setAttribute('href', href)
+    a.textContent = trimmedText
+
     if (existingAnchor) {
       existingAnchor.setAttribute('href', href)
       existingAnchor.textContent = trimmedText
+    } else if (savedRangeRef.current) {
+      const range = savedRangeRef.current
+      range.deleteContents()
+      range.insertNode(a)
     } else {
-      const sel = window.getSelection()
-      if (savedRangeRef.current && sel) {
-        sel.removeAllRanges()
-        sel.addRange(savedRangeRef.current)
-      }
-      const range = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null
-      const a = document.createElement('a')
-      a.setAttribute('href', href)
-      a.textContent = trimmedText
-      if (range) {
-        range.deleteContents()
-        range.insertNode(a)
-        range.setStartAfter(a)
-        range.setEndAfter(a)
-        sel?.removeAllRanges()
-        sel?.addRange(range)
-      } else {
-        editor.appendChild(a)
-      }
+      editor.appendChild(a)
     }
 
     onChange(editor.innerHTML)
@@ -232,7 +226,7 @@ export function LinkPopover({ editorRef, onChange }: LinkPopoverProps) {
     <>
       <button
         type="button"
-        onMouseDown={(e) => e.preventDefault()}
+        onMouseDown={captureSelection}
         onClick={openLinkModal}
         title="Link"
         className="flex h-8 w-8 items-center justify-center rounded text-[#243027]/60 transition-colors hover:bg-[#243027]/10 hover:text-[#243027]"
@@ -257,7 +251,7 @@ export function LinkPopover({ editorRef, onChange }: LinkPopoverProps) {
               </button>
             </div>
 
-            <form onSubmit={apply} className="space-y-4">
+            <div className="space-y-4">
               <div className="flex gap-2">
                 {(['article', 'section', 'external'] as const).map((m) => (
                   <button
@@ -371,13 +365,14 @@ export function LinkPopover({ editorRef, onChange }: LinkPopoverProps) {
                   Cancel
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={() => apply()}
                   className="rounded-full bg-[#243027] px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#76885B]"
                 >
                   Save
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

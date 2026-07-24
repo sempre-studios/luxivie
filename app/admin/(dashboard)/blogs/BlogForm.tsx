@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { RichTextEditor } from './RichTextEditor'
-import { MediaPicker } from './MediaPicker'
 import { SOCIAL_NETWORKS } from '@/lib/social'
 import type { BlogPost } from '@/lib/blogs'
 
@@ -44,7 +43,7 @@ export function BlogForm({ post, mode }: BlogFormProps) {
   const [seoTitle, setSeoTitle] = useState(post?.seoTitle || '')
   const [seoDescription, setSeoDescription] = useState(post?.seoDescription || '')
   const [suggestions, setSuggestions] = useState<{ categories: string[]; tags: string[] }>({ categories: [], tags: [] })
-  const [mediaPickerOpen, setMediaPickerOpen] = useState(false)
+  const [businessLinks, setBusinessLinks] = useState<Record<string, string>>({})
   const [socialVisibility, setSocialVisibility] = useState<Record<string, boolean>>(
     post?.socialVisibility || {}
   )
@@ -55,6 +54,14 @@ export function BlogForm({ post, mode }: BlogFormProps) {
         if (!res.ok) return
         const data = await res.json()
         setSuggestions({ categories: data.categories || [], tags: data.tags || [] })
+      })
+      .catch(() => {})
+
+    fetch('/api/admin/settings/social')
+      .then(async (res) => {
+        if (!res.ok) return
+        const data = await res.json()
+        setBusinessLinks(data.socialLinks || {})
       })
       .catch(() => {})
   }, [])
@@ -284,19 +291,6 @@ export function BlogForm({ post, mode }: BlogFormProps) {
             >
               {uploading ? 'Uploading...' : 'Upload Image'}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setMediaPickerOpen(true)}
-              className="w-full rounded-lg border-[#243027]/15 py-2.5 text-[10px] font-bold uppercase tracking-widest"
-            >
-              Recent Images
-            </Button>
-            <MediaPicker
-              open={mediaPickerOpen}
-              onClose={() => setMediaPickerOpen(false)}
-              onSelect={(url) => setFeaturedImageUrl(url)}
-            />
           </div>
 
           {/* Author */}
@@ -414,23 +408,25 @@ export function BlogForm({ post, mode }: BlogFormProps) {
           </div>
 
           {/* Social Visibility */}
-          <div className="space-y-3">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/60">
-              Social Share Visibility
-            </Label>
-            <p className="text-xs text-[#243027]/40">Toggle which share buttons appear on this article. Defaults to all visible.</p>
-            {SOCIAL_NETWORKS.map(({ key, label }) => (
-              <label key={key} className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={socialVisibility[key] !== false}
-                  onChange={(e) => setSocialVisibility((prev) => ({ ...prev, [key]: e.target.checked }))}
-                  className="h-4 w-4 rounded border-[#243027]/20 accent-[#76885B]"
-                />
-                <span className="text-sm text-[#243027]">{label}</span>
-              </label>
-            ))}
-          </div>
+          {SOCIAL_NETWORKS.some(({ key }) => Boolean(businessLinks[key]?.trim())) && (
+            <div className="space-y-3">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/60">
+                Social Share Visibility
+              </Label>
+              <p className="text-xs text-[#243027]/40">Toggle which share buttons appear on this article. Defaults to all visible.</p>
+              {SOCIAL_NETWORKS.filter(({ key }) => businessLinks[key]?.trim()).map(({ key, label }) => (
+                <label key={key} className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={socialVisibility[key] !== false}
+                    onChange={(e) => setSocialVisibility((prev) => ({ ...prev, [key]: e.target.checked }))}
+                    className="h-4 w-4 rounded border-[#243027]/20 accent-[#76885B]"
+                  />
+                  <span className="text-sm text-[#243027]">{label}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

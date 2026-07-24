@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { getAllBlogsForAdmin, type BlogPost } from '@/lib/blogs'
 import { Badge } from '@/components/ui/badge'
 import { BlogDeleteButton } from './BlogDeleteButton'
-import { AdminProfileDropdown } from './AdminProfileDropdown'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,7 +33,6 @@ export default async function AdminBlogsPage() {
           >
             + New Post
           </Link>
-          <AdminProfileDropdown />
         </div>
       </div>
 

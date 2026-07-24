@@ -195,39 +195,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   {estimateReadTime(post.content, post.readTime)}
                 </span>
               </div>
-              {/* Share buttons */}
-              <div className="flex gap-4 border-l border-[#243027]/10 pl-10">
-                {post.socialVisibility?.x !== false && (
-                  <a
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://luxivie.com/blog/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
-                    aria-label="Share on X"
-                  >
-                    <i className="ph ph-x-logo" />
-                  </a>
-                )}
-                {post.socialVisibility?.pinterest !== false && (
-                  <a
-                    href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(`https://luxivie.com/blog/${post.slug}`)}&description=${encodeURIComponent(post.title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
-                    aria-label="Share on Pinterest"
-                  >
-                    <i className="ph ph-pinterest-logo" />
-                  </a>
-                )}
-                {post.socialVisibility?.email !== false && (
-                  <a
-                    href={`mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`https://luxivie.com/blog/${post.slug}`)}`}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
-                    aria-label="Share by email"
-                  >
-                    <i className="ph ph-link" />
-                  </a>
-                )}
+              {/* Social links */}
+              <div className="border-l border-[#243027]/10 pl-10">
+                <SocialLinks visibility={post.socialVisibility} />
               </div>
             </div>
           </div>

@@ -1,24 +1,15 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { User, X, Loader2, Check } from 'lucide-react'
+import { Share2, X, Loader2, Check } from 'lucide-react'
 import { SOCIAL_NETWORKS, type SocialNetwork } from '@/lib/social'
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 MB'
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
-}
 
 function isValidHttps(value: string): boolean {
   if (!value.trim()) return true
   return /^https:\/\//i.test(value) && !/^(javascript|data|vbscript):/i.test(value)
 }
 
-interface AdminProfileDropdownProps {
-  quotaBytes?: number
-}
-
-export function AdminProfileDropdown({ quotaBytes }: AdminProfileDropdownProps) {
+export function AdminProfileDropdown() {
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [values, setValues] = useState<Record<SocialNetwork, string>>({
@@ -34,14 +25,11 @@ export function AdminProfileDropdown({ quotaBytes }: AdminProfileDropdownProps) 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [storage, setStorage] = useState<{ totalBytes: number; imageCount: number } | null>(null)
-  const [storageLoading, setStorageLoading] = useState(false)
 
   useEffect(() => {
     if (!open) return
 
     setLoading(true)
-    setStorageLoading(true)
     setError('')
     setSuccess(false)
 
@@ -62,15 +50,6 @@ export function AdminProfileDropdown({ quotaBytes }: AdminProfileDropdownProps) 
       })
       .catch(() => setError('Failed to load social links'))
       .finally(() => setLoading(false))
-
-    fetch('/api/admin/settings/storage')
-      .then(async (res) => {
-        if (!res.ok) throw new Error('Failed to load storage')
-        const data = await res.json()
-        setStorage({ totalBytes: data.totalBytes || 0, imageCount: data.imageCount || 0 })
-      })
-      .catch(() => setStorage({ totalBytes: 0, imageCount: 0 }))
-      .finally(() => setStorageLoading(false))
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false)
@@ -117,26 +96,22 @@ export function AdminProfileDropdown({ quotaBytes }: AdminProfileDropdownProps) 
     }
   }
 
-  const usagePercent = quotaBytes && quotaBytes > 0 && storage
-    ? Math.min(100, Math.round((storage.totalBytes / quotaBytes) * 100))
-    : null
-
   return (
     <div ref={wrapperRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className="flex h-10 w-10 items-center justify-center rounded-full border border-[#243027]/15 bg-white text-[#243027] transition-colors hover:bg-[#F2F0EB]"
-        aria-label="Admin profile settings"
+        aria-label="Social links"
         aria-expanded={open}
       >
-        <User className="h-5 w-5" />
+        <Share2 className="h-5 w-5" />
       </button>
 
       {open && (
         <div className="absolute right-0 top-full z-[110] mt-3 w-80 rounded-lg border border-[#243027]/10 bg-white p-5 shadow-xl sm:w-96">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-serif text-lg text-[#243027]">Admin Settings</h3>
+            <h3 className="font-serif text-lg text-[#243027]">Social Links</h3>
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -191,39 +166,6 @@ export function AdminProfileDropdown({ quotaBytes }: AdminProfileDropdownProps) 
                 </button>
               </div>
 
-              <div className="space-y-3 border-t border-[#243027]/10 pt-4">
-                <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/60">
-                  Storage Usage
-                </h4>
-                {storageLoading || !storage ? (
-                  <div className="flex items-center gap-2 text-sm text-[#243027]/50">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading storage...
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <p className="text-sm text-[#243027]">
-                      <span className="font-medium">{formatBytes(storage.totalBytes)}</span> used{' '}
-                      {quotaBytes && quotaBytes > 0 && (
-                        <span className="text-[#243027]/60">
-                          of {formatBytes(quotaBytes)}
-                        </span>
-                      )}
-                    </p>
-                    {usagePercent !== null && (
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-[#243027]/10">
-                        <div
-                          className="h-full rounded-full bg-[#76885B]"
-                          style={{ width: `${usagePercent}%` }}
-                        />
-                      </div>
-                    )}
-                    <p className="text-xs text-[#243027]/50">
-                      {storage.imageCount} {storage.imageCount === 1 ? 'image' : 'images'} stored
-                    </p>
-                  </div>
-                )}
-              </div>
             </div>
           )}
         </div>

@@ -56,8 +56,7 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [open, closeModal])
 
-  function apply(e: React.FormEvent) {
-    e.preventDefault()
+  function apply() {
     const editor = editorRef.current
     if (!editor) return
 
@@ -95,20 +94,11 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
   </div>
 </div>`
 
-    const sel = window.getSelection()
-    if (savedRangeRef.current && sel) {
-      sel.removeAllRanges()
-      sel.addRange(savedRangeRef.current)
-    }
-
-    const range = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null
-    if (range) {
+    if (savedRangeRef.current) {
+      const range = savedRangeRef.current
       const fragment = document.createRange().createContextualFragment(widget)
       range.deleteContents()
       range.insertNode(fragment)
-      range.collapse(false)
-      sel?.removeAllRanges()
-      sel?.addRange(range)
     } else {
       editor.innerHTML += widget
     }
@@ -144,7 +134,7 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
               </button>
             </div>
 
-            <form onSubmit={apply} className="space-y-4">
+            <div className="space-y-4">
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/60">Image URL</label>
                 <input
@@ -207,13 +197,14 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
                   Cancel
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={() => apply()}
                   className="rounded-full bg-[#243027] px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#76885B]"
                 >
                   Insert
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

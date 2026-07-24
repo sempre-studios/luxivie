@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { isAuthenticated } from '@/lib/admin-auth'
 import Link from 'next/link'
 import Image from 'next/image'
+import { AdminProfileDropdown } from './blogs/AdminProfileDropdown'
+import { StorageDropdown } from './blogs/StorageDropdown'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,12 +35,6 @@ export default async function DashboardLayout({
                 Blog Posts
               </Link>
               <Link
-                href="/admin/settings"
-                className="text-sm font-medium text-[#243027]/70 transition-colors hover:text-[#243027]"
-              >
-                Settings
-              </Link>
-              <Link
                 href="/blog"
                 target="_blank"
                 className="text-sm font-medium text-[#243027]/70 transition-colors hover:text-[#243027]"
@@ -47,14 +43,18 @@ export default async function DashboardLayout({
               </Link>
             </nav>
           </div>
-          <form action="/api/admin/auth" method="DELETE">
-            <button
-              type="submit"
-              className="rounded-full border border-[#243027]/10 px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-[#243027]/60 transition-all hover:bg-[#243027] hover:text-white"
-            >
-              Logout
-            </button>
-          </form>
+          <div className="flex items-center gap-6">
+            <AdminProfileDropdown />
+            <StorageDropdown />
+            <form action="/api/admin/auth" method="DELETE">
+              <button
+                type="submit"
+                className="rounded-full border border-[#243027]/10 px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-[#243027]/60 transition-all hover:bg-[#243027] hover:text-white"
+              >
+                Logout
+              </button>
+            </form>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-6 py-12">{children}</main>

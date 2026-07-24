@@ -11,7 +11,6 @@ import {
   ListOrdered,
   Quote,
   Image as ImageIcon,
-  Images,
   Code,
   Undo2,
   Redo2,
@@ -29,7 +28,6 @@ interface RichTextEditorProps {
 export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const isInternalChange = useRef(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const savedImageRangeRef = useRef<Range | null>(null)
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false)
 
@@ -64,12 +62,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   const handleImageClick = () => {
     const sel = window.getSelection()
     savedImageRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null
-    fileInputRef.current?.click()
-  }
-
-  const handleMediaPickerClick = () => {
-    const sel = window.getSelection()
-    savedImageRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null
     setMediaPickerOpen(true)
   }
 
@@ -82,34 +74,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     exec('insertImage', url)
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !editorRef.current) return
-
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!res.ok) throw new Error('Image upload failed')
-      const { url } = await res.json()
-
-      const sel = window.getSelection()
-      if (savedImageRangeRef.current && sel) {
-        sel.removeAllRanges()
-        sel.addRange(savedImageRangeRef.current)
-      }
-      exec('insertImage', url)
-    } catch (err) {
-      console.error('[RichTextEditor] Image upload error:', err)
-    } finally {
-      if (fileInputRef.current) fileInputRef.current.value = ''
-    }
-  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
@@ -158,8 +122,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         {toolbarBtn(() => formatBlock('<blockquote>'), <Quote className="h-4 w-4" />, 'Quote')}
         {divider}
         <LinkPopover editorRef={editorRef} onChange={handleInput} />
-        {toolbarBtn(handleImageClick, <ImageIcon className="h-4 w-4" />, 'Upload Image')}
-        {toolbarBtn(handleMediaPickerClick, <Images className="h-4 w-4" />, 'Recent Images')}
+        {toolbarBtn(handleImageClick, <ImageIcon className="h-4 w-4" />, 'Image')}
         <ProductWidgetPopover editorRef={editorRef} onChange={handleInput} />
         {toolbarBtn(() => exec('removeFormat'), <Code className="h-4 w-4" />, 'Clear Formatting')}
       </div>
@@ -175,13 +138,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         className="rich-text-editor min-h-[calc(100vh-380px)] flex-1 overflow-y-auto px-6 py-4 font-serif text-[15px] leading-relaxed text-[#243027] outline-none"
       />
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
-        onChange={handleImageUpload}
-        className="hidden"
-      />
       <MediaPicker
         open={mediaPickerOpen}
         onClose={() => setMediaPickerOpen(false)}

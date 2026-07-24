@@ -119,12 +119,10 @@ function estimateReadTime(html: string): string {
  */
 export async function getPublishedBlogs(): Promise<BlogPost[]> {
   try {
-    const now = new Date().toISOString()
     const { data, error } = await supabaseAdmin
       .from('blogs')
       .select('*')
       .in('status', ['published', 'scheduled'])
-      .lte('published_at', now)
       .order('published_at', { ascending: false })
 
     if (error) {
@@ -132,7 +130,15 @@ export async function getPublishedBlogs(): Promise<BlogPost[]> {
       return []
     }
 
-    return (data as BlogPostRow[]).map(rowToBlogPost)
+    const nowTime = new Date().getTime()
+    return (data as BlogPostRow[])
+      .map(rowToBlogPost)
+      .filter((post) => !post.publishedAt || new Date(post.publishedAt).getTime() <= nowTime)
+      .sort((a, b) => {
+        const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : nowTime
+        const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : nowTime
+        return bTime - aTime
+      })
   } catch (error) {
     console.error('Error in getPublishedBlogs:', error)
     return []
