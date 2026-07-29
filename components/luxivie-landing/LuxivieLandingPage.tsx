@@ -93,7 +93,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
             <div className="mb-8 flex items-center gap-4">
               <span className="h-px w-12 bg-lux-accent" />
               <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-                Made in Canada
+                Designed in Canada
               </span>
             </div>
             <h1 className="mb-10 font-serif text-5xl leading-none sm:text-6xl lg:text-8xl">

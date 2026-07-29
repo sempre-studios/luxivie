@@ -46,7 +46,7 @@ export function BrandPromise({ content }: BrandPromiseProps = {}) {
   const defaultPromises = [
     {
       icon: MapPin,
-      title: "Made in Canada",
+      title: "Designed in Canada",
       description: "Crafted with clean formulas in trusted GMP-certified facilities.",
     },
     {

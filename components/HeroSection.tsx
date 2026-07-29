@@ -39,7 +39,7 @@ export function HeroSection({ content }: HeroSectionProps = {}) {
   // Content structure is now guaranteed by Zod validation
   // No need for defensive unwrapping - structure is always flat and correct
   
-  const badge = content?.badge || { icon: 'Leaf', text: 'Made in Canada' };
+  const badge = content?.badge || { icon: 'Leaf', text: 'Designed in Canada' };
   const title = content?.title || 'Clean Beauty That Works—Made With Care in Canada';
   const subtitle = content?.subtitle || 'Luxurious hair care and skincare crafted with clean ingredients, gentle botanicals, and modern science.';
   const primaryCta = content?.primaryCta || { label: 'Shop Bestsellers', href: '#products' };
