@@ -56,6 +56,19 @@ interface BlogPostRow {
   updated_at: string
 }
 
+function normalizeStatus(
+  status: 'draft' | 'published' | 'scheduled',
+  published_at: string | null
+): 'draft' | 'published' | 'scheduled' {
+  if (status === 'scheduled' && published_at && new Date(published_at).getTime() <= Date.now()) {
+    return 'published'
+  }
+  if (status === 'published' && published_at && new Date(published_at).getTime() > Date.now()) {
+    return 'scheduled'
+  }
+  return status
+}
+
 function rowToBlogPost(row: BlogPostRow): BlogPost {
   return {
     id: row.id,
@@ -65,7 +78,7 @@ function rowToBlogPost(row: BlogPostRow): BlogPost {
     content: row.content || '',
     image_url: row.image_url || undefined,
     author: row.author || undefined,
-    status: row.status,
+    status: normalizeStatus(row.status, row.published_at),
     publishedAt: row.published_at || undefined,
     readTime: row.read_time || undefined,
     category: row.category || undefined,
