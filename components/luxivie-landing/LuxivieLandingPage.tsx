@@ -102,7 +102,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
             </h1>
             <p className="mb-12 max-w-lg text-lg leading-relaxed text-lux-text/70">
               Luxivie is modern hair care crafted with thoughtfully chosen
-              ingredients and a feel-good routine-clean, gentle, and designed
+              ingredients and a feel-good routine clean, gentle, and designed
               for everyday results.
             </p>
             <div className="mb-16 flex flex-wrap items-center gap-6">
