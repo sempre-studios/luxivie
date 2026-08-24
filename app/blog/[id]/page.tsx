@@ -1,7 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link"
+import type { Metadata } from "next"
 import { getBlogBySlug, getPublishedBlogs, type BlogPost } from "@/lib/blogs"
 import { LandingNav } from "@/components/luxivie-landing/LandingNav"
+import { SocialLinks } from "@/components/luxivie-landing/SocialLinks"
 
 export const dynamic = "force-dynamic"
 
@@ -9,10 +11,18 @@ interface BlogPostPageProps {
   params: Promise<{ id: string }>
 }
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1596501048547-e90b7987034c?q=80&w=2070&auto=format&fit=crop"
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const post = await getBlogBySlug(id)
+  if (!post) return { title: 'Journal' }
+  return {
+    title: post.seoTitle || post.title,
+    description: post.seoDescription || post.excerpt || undefined,
+  }
+}
 
-function formatDate(dateString: string) {
+function formatDate(dateString?: string) {
+  if (!dateString) return "—"
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -115,7 +125,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <LandingNav />
 
       {/* ── Article Header ── */}
-      <header className="px-6 pb-20 pt-48 lg:px-24">
+      <header className="px-6 pb-12 pt-48 lg:px-24">
         <div className="mx-auto max-w-5xl">
           {/* Breadcrumb + status row */}
           <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -157,15 +167,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 ))}
               </div>
             )}
-
-            {/* Excerpt pull-quote */}
-            {post.excerpt && (
-              <div className="max-w-3xl border-l-4 border-[#B08968]/20 pl-8">
-                <p className="text-2xl font-light italic leading-relaxed text-[#243027]/70">
-                  &ldquo;{post.excerpt}&rdquo;
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Author + meta row */}
@@ -194,48 +195,30 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   {estimateReadTime(post.content, post.readTime)}
                 </span>
               </div>
-              {/* Share buttons */}
-              <div className="flex gap-4 border-l border-[#243027]/10 pl-10">
-                {["x-logo", "pinterest-logo", "link"].map((icon) => (
-                  <button
-                    key={icon}
-                    type="button"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#243027]/10 transition-all hover:bg-[#243027] hover:text-white"
-                    aria-label={icon}
-                  >
-                    <i className={`ph ph-${icon}`} />
-                  </button>
-                ))}
+              {/* Social links */}
+              <div className="border-l border-[#243027]/10 pl-10">
+                <SocialLinks visibility={post.socialVisibility} />
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* ── Hero Image ── */}
-      <section className="mb-32 px-6 lg:px-24">
-        <div className="mx-auto max-w-7xl">
-          <div
-            className="group relative aspect-[21/9] w-full overflow-hidden rounded-[40px]"
-            style={{ boxShadow: "20px 20px 60px rgba(36,48,39,0.05),-5px -5px 30px rgba(255,255,255,0.5)" }}
+      <div className="px-6 pb-12 lg:px-24">
+        <div className="mx-auto max-w-5xl">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#76885B] transition-colors hover:text-[#243027]"
           >
-            <img
-              src={post.image_url || FALLBACK_IMAGE}
-              alt={post.title}
-              className="h-full w-full scale-105 object-cover grayscale-[30%] transition-all duration-1000 group-hover:scale-100 group-hover:grayscale-0"
-            />
-            {post.category && (
-              <div className="absolute bottom-8 right-8 text-[10px] font-bold uppercase tracking-[0.4em] text-white/80 drop-shadow-lg">
-                {post.category} • Luxivie Journal
-              </div>
-            )}
-          </div>
+            <i className="ph ph-arrow-left" />
+            Back to Journal
+          </Link>
         </div>
-      </section>
+      </div>
 
       {/* ── Article Body ── */}
       <section className="mb-40 px-6 lg:px-24">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl">
           <div
             className="article-content"
             style={
@@ -283,59 +266,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       {/* ── Footer (matches /blog) ── */}
       <footer className="border-t border-lux-text/5 bg-lux-background px-6 pb-12 pt-24 sm:px-12 sm:pt-32">
-        <div className="mx-auto mb-24 grid max-w-7xl grid-cols-12 gap-12 sm:mb-32">
-          <div className="col-span-12 lg:col-span-4">
+        <div className="mx-auto mb-24 flex max-w-7xl flex-col justify-between gap-12 sm:mb-32 lg:flex-row lg:items-start">
+          <div className="max-w-sm">
             <div className="mb-10 flex items-center">
               <img src="/luxivie-logo.png" alt="LUXIVIE" className="h-10 w-auto sm:h-12" />
             </div>
             <p className="mb-10 max-w-sm leading-relaxed text-lux-text/40">
               Small batch hair care, formulated for the conscious soul. Botanically powerful, ethically created.
             </p>
-            <div className="flex gap-4">
-              {["instagram-logo", "pinterest-logo", "tiktok-logo"].map((icon) => (
-                <a
-                  key={icon}
-                  href="#"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-lux-text/10 transition-all hover:bg-lux-accent hover:text-white"
-                  aria-label={icon.replace("-logo", "")}
-                >
-                  <i className={`ph ph-${icon} text-xl`} aria-hidden />
-                </a>
-              ))}
-            </div>
           </div>
-          <div className="col-span-6 lg:col-span-2">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">Collection</h5>
-            <ul className="space-y-6 text-sm text-lux-text/60">
-              {["Bestsellers", "Scalp Care", "Growth Rituals", "New Arrivals"].map((t) => (
-                <li key={t}>
-                  <Link href="/products" className="transition-colors hover:text-lux-text">{t}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="col-span-6 lg:col-span-2">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">Journal</h5>
-            <ul className="space-y-6 text-sm text-lux-text/60">
-              {[["Our Sourcing", "/blog"], ["Ritual Guides", "/blog"], ["Ingredients", "/blog"], ["About Us", "/blog"]].map(([label, href]) => (
-                <li key={label}>
-                  <a href={href} className="transition-colors hover:text-lux-text">{label}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="col-span-12 lg:col-span-4">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">Locations</h5>
-            <div className="space-y-8">
-              <div>
-                <p className="mb-2 text-sm font-bold text-lux-text">Vancouver Flagship</p>
-                <p className="text-sm text-lux-text/40">1240 Robson St, BC V6E 1C1</p>
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-bold text-lux-text">Toronto Studio</p>
-                <p className="text-sm text-lux-text/40">181 Bay Street, ON M5J 2T3</p>
-              </div>
-            </div>
+          <div className="lg:ml-auto">
+            <SocialLinks
+              visibility={post.socialVisibility}
+              className="flex justify-start gap-4 lg:justify-end"
+            />
           </div>
         </div>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border-t border-lux-text/5 pt-12 md:flex-row">

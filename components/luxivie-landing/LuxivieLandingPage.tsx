@@ -2,6 +2,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { LandingNav } from "./LandingNav"
+import { SocialLinks } from "./SocialLinks"
 import { cn } from "@/components/ui/utils"
 import {
   type LandingProduct,
@@ -86,13 +87,13 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
     <div className="m-0 h-full w-full overflow-x-hidden bg-lux-background p-0 text-lux-text scrollbar-hide">
       <LandingNav />
 
-      <section className="relative flex min-h-screen items-center px-6 pb-20 pt-20 sm:px-12 sm:pt-28">
+      <section id="hero" className="relative flex min-h-screen items-center px-6 pb-20 pt-20 sm:px-12 sm:pt-28">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-20">
           <div>
             <div className="mb-8 flex items-center gap-4">
               <span className="h-px w-12 bg-lux-accent" />
               <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-                Made in Canada
+                Designed in Canada
               </span>
             </div>
             <h1 className="mb-10 font-serif text-5xl leading-none sm:text-6xl lg:text-8xl">
@@ -106,12 +107,12 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
               for everyday results.
             </p>
             <div className="mb-16 flex flex-wrap items-center gap-6">
-              <Link
-                href="/products"
+              <a
+                href="#products"
                 className="rounded-full bg-lux-accent px-10 py-5 text-[11px] font-bold uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:brightness-110 shadow-[0_25px_50px_-12px_rgb(201_124_93_/_0.2)]"
               >
                 Shop Now
-              </Link>
+              </a>
               <button
                 type="button"
                 className="group flex items-center gap-3 border-b border-lux-text pb-1 text-[11px] font-bold uppercase tracking-[0.2em]"
@@ -122,7 +123,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
             </div>
           </div>
 
-          <div className="relative flex justify-center lg:justify-end">
+          <div className="relative hidden md:flex md:justify-center lg:justify-end">
             <div className="organic-shape absolute right-0 top-1/2 -z-10 h-[90%] w-[110%] -translate-y-1/2 bg-lux-mist opacity-60" />
             <div className="relative flex items-end gap-6 sm:gap-8">
               <div className="product-image-container mb-12 h-80 w-52 border-4 border-white bg-neutral-200 sm:h-96 sm:w-64">
@@ -144,7 +145,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
         </div>
       </section>
 
-      <section className="border-y border-lux-text/5 px-6 py-24 sm:px-12">
+      <section id="values" className="border-y border-lux-text/5 px-6 py-24 sm:px-12">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 md:grid-cols-3">
           {[
             {
@@ -319,7 +320,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-lux-text px-6 py-32 text-lux-background sm:px-12">
+      <section id="philosophy" className="relative overflow-hidden bg-lux-text px-6 py-32 text-lux-background sm:px-12">
         <div className="mx-auto max-w-7xl text-center">
           <span className="mb-8 block text-[11px] font-bold uppercase tracking-[0.4em] text-lux-accent">
             Our Philosophy
@@ -352,7 +353,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
         </div>
       </section>
 
-      <section className="bg-white px-6 py-32 sm:px-12">
+      <section id="ingredients" className="bg-white px-6 py-32 sm:px-12">
         <div className="mx-auto max-w-7xl">
           <div className="mb-20 text-center">
             <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
@@ -500,7 +501,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
         </div>
       </section>
 
-      <section className="px-6 py-24 sm:px-12">
+      <section id="newsletter" className="px-6 py-24 sm:px-12">
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[60px] bg-lux-accent p-12 text-center sm:p-20">
           <div className="organic-shape absolute -left-[50px] -top-[50px] h-64 w-64 bg-white/10" />
           <div className="relative z-10">
@@ -528,7 +529,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
         </div>
       </section>
 
-      <section className="bg-lux-text px-6 py-32 text-center text-lux-background sm:px-12 sm:py-40">
+      <section id="cta" className="bg-lux-text px-6 py-32 text-center text-lux-background sm:px-12 sm:py-40">
         <div className="mx-auto max-w-3xl">
           <h2 className="mb-10 font-serif text-4xl sm:text-6xl">
             Ready to transform your hair?
@@ -554,9 +555,9 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
         </div>
       </section>
 
-      <footer className="border-t border-lux-text/5 bg-lux-background px-6 pb-12 pt-24 sm:px-12 sm:pt-32">
-        <div className="mx-auto mb-24 grid max-w-7xl grid-cols-12 gap-12 sm:mb-32">
-          <div className="col-span-12 lg:col-span-4">
+      <footer id="footer" className="border-t border-lux-text/5 bg-lux-background px-6 pb-12 pt-24 sm:px-12 sm:pt-32">
+        <div className="mx-auto mb-24 flex max-w-7xl flex-col justify-between gap-12 sm:mb-32 lg:flex-row lg:items-start">
+          <div className="max-w-sm">
             <div className="mb-10 flex items-center">
               <Image
                 src="/luxivie-logo.png"
@@ -570,79 +571,9 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
               Small batch hair care, formulated for the conscious soul.
               Botanically powerful, ethically created.
             </p>
-            <div className="flex gap-4">
-              {["instagram-logo", "pinterest-logo", "tiktok-logo"].map((icon) => (
-                <a
-                  key={icon}
-                  href="#"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-lux-text/10 transition-all hover:bg-lux-accent hover:text-white"
-                  aria-label={icon.replace("-logo", "")}
-                >
-                  <i className={`ph ph-${icon} text-xl`} aria-hidden />
-                </a>
-              ))}
-            </div>
           </div>
-          <div className="col-span-6 lg:col-span-2">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Collection
-            </h5>
-            <ul className="space-y-6 text-sm text-lux-text/60">
-              {["Bestsellers", "Scalp Care", "Growth Rituals", "New Arrivals"].map(
-                (t) => (
-                  <li key={t}>
-                    <Link
-                      href="/products"
-                      className="transition-colors hover:text-lux-text"
-                    >
-                      {t}
-                    </Link>
-                  </li>
-                ),
-              )}
-            </ul>
-          </div>
-          <div className="col-span-6 lg:col-span-2">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Journal
-            </h5>
-            <ul className="space-y-6 text-sm text-lux-text/60">
-              {[
-                ["Our Sourcing", "/blog"],
-                ["Ritual Guides", "/blog"],
-                ["Ingredients", "/blog"],
-                ["About Us", "/blog"],
-              ].map(([label, href]) => (
-                <li key={label}>
-                  <Link href={href} className="transition-colors hover:text-lux-text">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="col-span-12 lg:col-span-4">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Locations
-            </h5>
-            <div className="space-y-8">
-              <div>
-                <p className="mb-2 text-sm font-bold text-lux-text">
-                  Vancouver Flagship
-                </p>
-                <p className="text-sm text-lux-text/40">
-                  1240 Robson St, BC V6E 1C1
-                </p>
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-bold text-lux-text">
-                  Toronto Studio
-                </p>
-                <p className="text-sm text-lux-text/40">
-                  181 Bay Street, ON M5J 2T3
-                </p>
-              </div>
-            </div>
+          <div className="lg:ml-auto">
+            <SocialLinks className="flex justify-start gap-4 lg:justify-end" />
           </div>
         </div>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border-t border-lux-text/5 pt-12 md:flex-row">

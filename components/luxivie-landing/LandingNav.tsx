@@ -76,14 +76,16 @@ export function LandingNav() {
     <>
       <nav className="fixed inset-x-0 top-0 z-[100] flex w-full items-center justify-between border-b border-lux-text/10 bg-lux-background/95 px-4 py-5 backdrop-blur-md sm:px-12">
         <div className="flex items-center">
-          <Image
-            src="/luxivie-logo.png"
-            alt="LUXIVIE"
-            width={180}
-            height={48}
-            className="h-9 w-auto sm:h-10"
-            priority
-          />
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/luxivie-logo.png"
+              alt="LUXIVIE"
+              width={180}
+              height={48}
+              className="h-9 w-auto sm:h-10"
+              priority
+            />
+          </Link>
         </div>
 
         <button
@@ -114,10 +116,10 @@ export function LandingNav() {
             </>
           ) : (
             <Link
-              href="/"
+              href="/blog"
               className="rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
             >
-              Home
+              Journal
             </Link>
           )}
         </div>
@@ -138,13 +140,15 @@ export function LandingNav() {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="mb-10 flex items-center justify-between">
-            <Image
-              src="/luxivie-logo.png"
-              alt="LUXIVIE"
-              width={140}
-              height={40}
-              className="h-8 w-auto"
-            />
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/luxivie-logo.png"
+                alt="LUXIVIE"
+                width={140}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </Link>
             <button
               type="button"
               className="flex h-9 w-9 items-center justify-center rounded-full border border-lux-text/20"
@@ -173,11 +177,11 @@ export function LandingNav() {
               </>
             ) : (
               <Link
-                href="/"
+                href="/blog"
                 className="inline-flex w-fit rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
                 onClick={closeMenu}
               >
-                Home
+                Journal
               </Link>
             )}
           </div>

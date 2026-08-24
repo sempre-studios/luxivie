@@ -35,6 +35,10 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${playfair.variable} scrollbar-hide`}
     >
       <head>
+        <meta
+          name="google-site-verification"
+          content="ygwzXbhcNOl2BeYyStBUYyAcnNEaorH9scUSmqFRoIs"
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

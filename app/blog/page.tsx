@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic"
 
 import Link from "next/link"
 import { LandingNav } from "@/components/luxivie-landing/LandingNav"
+import { SocialLinks } from "@/components/luxivie-landing/SocialLinks"
 import { getPublishedBlogs } from "@/lib/blogs"
 
 const FALLBACK_IMAGE =
@@ -21,13 +22,23 @@ function estimateReadTime(html: string, readTime?: string) {
   return `${Math.max(3, Math.ceil(words / 220))} Min Read`
 }
 
-export default async function BlogPage() {
-  const businessSlug = process.env.NEXT_PUBLIC_ORG_SLUG || "luxivie"
-  const posts = await getPublishedBlogs(businessSlug)
-  const featured = posts[0]
-  const list = posts.slice(1, 7)
+function extractFirstImageFromContent(html: string): string | undefined {
+  const imgMatch = html.match(/<img[^>]+src=["']([^"']+)["']/i)
+  return imgMatch ? imgMatch[1] : undefined
+}
+
+interface BlogPageProps {
+  searchParams: Promise<{ category?: string }>
+}
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const { category } = await searchParams
+  const posts = await getPublishedBlogs()
+  const categories = [...new Set(posts.map((p) => p.category).filter(Boolean))]
+  const filteredPosts = category ? posts.filter((p) => p.category === category) : posts
+  const list = filteredPosts.slice(0, 7)
   const heroText =
-    featured?.excerpt ||
+    posts[0]?.excerpt ||
     "Nature never hurries, yet everything is accomplished. Our journal explores the slow philosophy of botanical beauty."
 
   return (
@@ -58,13 +69,41 @@ export default async function BlogPage() {
             <div className="flex items-center gap-4">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">Issue No. 04</span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">•</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#76885B]">{featured ? formatDate(featured.publishedAt) : "Winter 2025"}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#76885B]">{posts[0] ? formatDate(posts[0].publishedAt) : "Winter 2025"}</span>
             </div>
           </div>
         </div>
       </header>
 
       <section className="mb-40 px-8 lg:px-20">
+        {categories.length > 0 && (
+          <div className="mb-12 flex flex-wrap items-center gap-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">Filter:</span>
+            <Link
+              href="/blog"
+              className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                !category
+                  ? 'border-[#76885B] bg-[#76885B] text-white'
+                  : 'border-[#243027]/10 text-[#243027]/60 hover:border-[#76885B] hover:text-[#76885B]'
+              }`}
+            >
+              All
+            </Link>
+            {categories.map((c) => (
+              <Link
+                key={c}
+                href={`/blog?category=${encodeURIComponent(c as string)}`}
+                className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                  category === c
+                    ? 'border-[#76885B] bg-[#76885B] text-white'
+                    : 'border-[#243027]/10 text-[#243027]/60 hover:border-[#76885B] hover:text-[#76885B]'
+                }`}
+              >
+                {c}
+              </Link>
+            ))}
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-x-12 gap-y-32 md:grid-cols-2 lg:grid-cols-3">
           {list.length > 0 ? (
             list.map((post, idx) => {
@@ -76,7 +115,7 @@ export default async function BlogPage() {
                   className={`${isWide ? "lg:col-span-2 mt-12" : idx === 1 ? "lg:mt-24" : ""} group cursor-pointer transition-transform duration-300 hover:-translate-y-2`}
                 >
                   <div className={`${isWide ? "aspect-[16/9]" : "aspect-[3/4]"} relative mb-10 overflow-hidden bg-[#243027]/5`}>
-                    <img src={post.image_url || FALLBACK_IMAGE} className="h-full w-full object-cover grayscale transition-all duration-700 hover:grayscale-0" alt={post.title} />
+                    <img src={extractFirstImageFromContent(post.content) || post.image_url || FALLBACK_IMAGE} className="h-full w-full object-cover grayscale transition-all duration-700 hover:grayscale-0" alt={post.title} />
                     {!isWide ? (
                       <div className="absolute bottom-6 right-6 text-[9px] font-bold uppercase tracking-[0.4em] text-white/80 transition-colors [writing-mode:vertical-rl] group-hover:text-white">
                         {post.category || "Volume VI"}
@@ -138,8 +177,8 @@ export default async function BlogPage() {
       </section>
 
       <footer className="border-t border-lux-text/5 bg-lux-background px-6 pb-12 pt-24 sm:px-12 sm:pt-32">
-        <div className="mx-auto mb-24 grid max-w-7xl grid-cols-12 gap-12 sm:mb-32">
-          <div className="col-span-12 lg:col-span-4">
+        <div className="mx-auto mb-24 flex max-w-7xl flex-col justify-between gap-12 sm:mb-32 lg:flex-row lg:items-start">
+          <div className="max-w-sm">
             <div className="mb-10 flex items-center">
               <img
                 src="/luxivie-logo.png"
@@ -151,79 +190,9 @@ export default async function BlogPage() {
               Small batch hair care, formulated for the conscious soul.
               Botanically powerful, ethically created.
             </p>
-            <div className="flex gap-4">
-              {["instagram-logo", "pinterest-logo", "tiktok-logo"].map((icon) => (
-                <a
-                  key={icon}
-                  href="#"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-lux-text/10 transition-all hover:bg-lux-accent hover:text-white"
-                  aria-label={icon.replace("-logo", "")}
-                >
-                  <i className={`ph ph-${icon} text-xl`} aria-hidden />
-                </a>
-              ))}
-            </div>
           </div>
-          <div className="col-span-6 lg:col-span-2">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Collection
-            </h5>
-            <ul className="space-y-6 text-sm text-lux-text/60">
-              {["Bestsellers", "Scalp Care", "Growth Rituals", "New Arrivals"].map(
-                (t) => (
-                  <li key={t}>
-                    <Link
-                      href="/products"
-                      className="transition-colors hover:text-lux-text"
-                    >
-                      {t}
-                    </Link>
-                  </li>
-                ),
-              )}
-            </ul>
-          </div>
-          <div className="col-span-6 lg:col-span-2">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Journal
-            </h5>
-            <ul className="space-y-6 text-sm text-lux-text/60">
-              {[
-                ["Our Sourcing", "/blog"],
-                ["Ritual Guides", "/blog"],
-                ["Ingredients", "/blog"],
-                ["About Us", "/blog"],
-              ].map(([label, href]) => (
-                <li key={label}>
-                  <Link href={href} className="transition-colors hover:text-lux-text">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="col-span-12 lg:col-span-4">
-            <h5 className="mb-10 text-[11px] font-bold uppercase tracking-[0.3em] text-lux-accent">
-              Locations
-            </h5>
-            <div className="space-y-8">
-              <div>
-                <p className="mb-2 text-sm font-bold text-lux-text">
-                  Vancouver Flagship
-                </p>
-                <p className="text-sm text-lux-text/40">
-                  1240 Robson St, BC V6E 1C1
-                </p>
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-bold text-lux-text">
-                  Toronto Studio
-                </p>
-                <p className="text-sm text-lux-text/40">
-                  181 Bay Street, ON M5J 2T3
-                </p>
-              </div>
-            </div>
+          <div className="lg:ml-auto">
+            <SocialLinks className="flex justify-start gap-4 lg:justify-end" />
           </div>
         </div>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border-t border-lux-text/5 pt-12 md:flex-row">
