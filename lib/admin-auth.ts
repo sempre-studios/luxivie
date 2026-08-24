@@ -13,13 +13,13 @@ function getSecret(): string {
   return secret
 }
 
-function sign(payload: string): string {
+export function sign(payload: string): string {
   const secret = getSecret()
   const sig = crypto.createHmac('sha256', secret).update(payload).digest('hex')
   return `${payload}.${sig}`
 }
 
-function verify(token: string): boolean {
+export function verify(token: string): boolean {
   const idx = token.lastIndexOf('.')
   if (idx === -1) return false
   const payload = token.slice(0, idx)
