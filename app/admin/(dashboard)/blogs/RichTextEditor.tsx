@@ -14,6 +14,7 @@ import {
   Undo2,
   Redo2,
   X,
+  Pencil,
 } from 'lucide-react'
 import { LinkPopover } from './LinkPopover'
 import { ProductWidgetPopover } from './ProductWidgetPopover'
@@ -32,6 +33,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   const savedImageRangeRef = useRef<Range | null>(null)
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false)
   const [hoveredWidget, setHoveredWidget] = useState<HTMLElement | null>(null)
+  const [editingProductWidget, setEditingProductWidget] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
     if (editorRef.current && !isInternalChange.current) {
@@ -124,6 +126,8 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
       if (target.closest('.product-widget-remove') && editorRef.current) {
         widget.remove()
         handleInput()
+      } else if (target.closest('.product-widget-edit') && editorRef.current) {
+        setEditingProductWidget(widget as HTMLElement)
       }
     }
   }
@@ -163,7 +167,12 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         {divider}
         <LinkPopover editorRef={editorRef} onChange={handleInput} />
         {toolbarBtn(handleImageClick, <ImageIcon className="h-4 w-4" />, 'Image')}
-        <ProductWidgetPopover editorRef={editorRef} onChange={handleInput} />
+        <ProductWidgetPopover
+          editorRef={editorRef}
+          onChange={handleInput}
+          editingWidget={editingProductWidget}
+          onCloseEdit={() => setEditingProductWidget(null)}
+        />
       </div>
 
       {/* Editable area */}
@@ -183,25 +192,42 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           const widgetRect = hoveredWidget.getBoundingClientRect()
           const wrapperRect = wrapperRef.current.getBoundingClientRect()
           return (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                hoveredWidget.remove()
-                setHoveredWidget(null)
-                handleInput()
-              }}
+            <div
               onMouseLeave={() => setHoveredWidget(null)}
               style={{
                 position: 'absolute',
                 top: widgetRect.top - wrapperRect.top + 8,
                 right: wrapperRect.right - widgetRect.right + 8,
               }}
-              className="product-widget-overlay flex h-7 w-7 items-center justify-center rounded-full bg-[#243027] text-white shadow-lg transition-colors hover:bg-[#76885B]"
-              aria-label="Remove product widget"
+              className="product-widget-overlay flex items-center gap-2"
             >
-              <X className="h-4 w-4" />
-            </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  hoveredWidget.remove()
+                  setHoveredWidget(null)
+                  handleInput()
+                }}
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-[#243027] text-white shadow-lg transition-colors hover:bg-[#76885B]"
+                aria-label="Remove product widget"
+                title="Remove product widget"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setEditingProductWidget(hoveredWidget)
+                }}
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-[#243027] text-white shadow-lg transition-colors hover:bg-[#76885B]"
+                aria-label="Edit product widget"
+                title="Edit product widget"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            </div>
           )
         })()
       )}
@@ -259,8 +285,9 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           border-radius: 8px;
           margin: 0.75rem 0;
         }
-        .rich-text-editor :global(.product-widget:hover .product-widget-remove) {
-          display: flex !important;
+        .rich-text-editor :global(.product-widget-edit),
+        .rich-text-editor :global(.product-widget-remove) {
+          display: none !important;
         }
         .rich-text-editor :global(strong) {
           font-weight: 700;

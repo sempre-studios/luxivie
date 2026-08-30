@@ -6,6 +6,8 @@ import { Package, X, Upload, Loader2, Image as ImageIcon, Check } from 'lucide-r
 interface ProductWidgetPopoverProps {
   editorRef: React.RefObject<HTMLDivElement | null>
   onChange: (html: string) => void
+  editingWidget?: HTMLElement | null
+  onCloseEdit?: () => void
 }
 
 function escapeHtml(text: string) {
@@ -25,8 +27,10 @@ interface MediaImage {
 
 type WidgetStyle = 'card' | 'banner' | 'minimal'
 
-export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopoverProps) {
+export function ProductWidgetPopover({ editorRef, onChange, editingWidget, onCloseEdit }: ProductWidgetPopoverProps) {
   const [open, setOpen] = useState(false)
+  const [isEdit, setIsEdit] = useState(false)
+  const [editTarget, setEditTarget] = useState<HTMLElement | null>(null)
   const [imageUrl, setImageUrl] = useState('')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -62,6 +66,8 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
     setWidgetStyle('card')
     setFetchError('')
     setUploadError('')
+    setIsEdit(false)
+    setEditTarget(null)
     setOpen(true)
   }
 
@@ -78,6 +84,34 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
       .catch(() => setFetchError('Failed to load recent images'))
       .finally(() => setLoading(false))
   }, [open])
+
+  function parseWidget(widget: HTMLElement) {
+    const img = widget.querySelector('img')
+    const h3 = widget.querySelector('h3')
+    const p = widget.querySelector('p')
+    const link = widget.querySelector('a[href]') as HTMLAnchorElement | null
+    const ctaText = link?.textContent?.replace(/\s*→\s*$/, '').trim() || link?.textContent?.trim() || ''
+
+    setImageUrl(img?.getAttribute('src') || '')
+    setName(h3?.textContent || '')
+    setDescription(p?.textContent || '')
+    setCtaLabel(widget.getAttribute('data-cta') || ctaText || 'Shop Now')
+    setDestinationUrl(link?.getAttribute('href') || '')
+    setWidgetStyle((widget.getAttribute('data-style') as WidgetStyle) || 'card')
+    setPickerTab('upload')
+    setError('')
+    setFetchError('')
+    setUploadError('')
+    setStep(2)
+  }
+
+  useEffect(() => {
+    if (!editingWidget) return
+    setIsEdit(true)
+    setEditTarget(editingWidget)
+    parseWidget(editingWidget)
+    setOpen(true)
+  }, [editingWidget])
 
   const handleUpload = async (file: File) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
@@ -128,8 +162,11 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
 
   const closeModal = useCallback(() => {
     setOpen(false)
+    setIsEdit(false)
+    setEditTarget(null)
+    onCloseEdit?.()
     editorRef.current?.focus()
-  }, [editorRef])
+  }, [editorRef, onCloseEdit])
 
   useEffect(() => {
     if (!open) return
@@ -163,7 +200,7 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
       destHref = `https://${destHref}`
     }
 
-    const removeBtn = `<button type="button" class="product-widget-remove" aria-label="Remove product widget" style="position:absolute;top:0.5rem;right:0.5rem;display:none;align-items:center;justify-content:center;width:28px;height:28px;background:#243027;color:#fff;border:none;border-radius:9999px;cursor:pointer;padding:0;z-index:1;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>`
+    const controls = `<button type="button" class="product-widget-remove" aria-label="Remove product widget" style="position:absolute;top:0.5rem;right:2.5rem;display:none;align-items:center;justify-content:center;width:28px;height:28px;background:#243027;color:#fff;border:none;border-radius:9999px;cursor:pointer;padding:0;z-index:1;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><button type="button" class="product-widget-edit" aria-label="Edit product widget" style="position:absolute;top:0.5rem;right:0.5rem;display:none;align-items:center;justify-content:center;width:28px;height:28px;background:#243027;color:#fff;border:none;border-radius:9999px;cursor:pointer;padding:0;z-index:1;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>`
 
     let widget = ''
 
@@ -171,20 +208,22 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
       const imageHtml = image
         ? `<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;"><img src="${escapeHtml(image)}" alt="${escapeHtml(title || 'Product')}" style="width:100%;height:auto;border-radius:0.75rem;object-fit:cover;aspect-ratio:1/1;" /></a>`
         : ''
-      widget = `<div class="product-widget" style="position:relative;margin:1.5rem 0;padding:1.25rem;border:1px solid #e5e7eb;border-radius:1rem;background:#fff;max-width:24rem;">${removeBtn}${imageHtml}<div style="padding-top:1rem;"><h3 style="margin:0 0 0.5rem;font-size:1.25rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;">${escapeHtml(title || 'Product')}</h3>${desc ? `<p style="margin:0 0 1rem;font-size:0.95rem;line-height:1.5;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#243027;color:#fff;padding:0.75rem 1.5rem;border-radius:9999px;text-decoration:none;font-size:0.65rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.12em;transition:opacity 0.2s;">${escapeHtml(label)}</a></div></div>`
+      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" style="position:relative;margin:1.5rem 0;padding:1.25rem;border:1px solid #e5e7eb;border-radius:1rem;background:#fff;max-width:24rem;">${controls}${imageHtml}<div style="padding-top:1rem;"><h3 style="margin:0 0 0.5rem;font-size:1.25rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;">${escapeHtml(title || 'Product')}</h3>${desc ? `<p style="margin:0 0 1rem;font-size:0.95rem;line-height:1.5;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#243027;color:#fff;padding:0.75rem 1.5rem;border-radius:9999px;text-decoration:none;font-size:0.65rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.12em;transition:opacity 0.2s;">${escapeHtml(label)}</a></div></div>`
     } else if (widgetStyle === 'banner') {
       const imageHtml = image
         ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title || 'Product')}" style="width:120px;height:120px;border-radius:0.5rem;object-fit:cover;flex-shrink:0;" />`
         : ''
-      widget = `<div class="product-widget" style="position:relative;margin:1.5rem 0;padding:1rem;border:1px solid #e5e7eb;border-radius:0.75rem;background:#fff;max-width:32rem;display:flex;gap:1rem;align-items:center;">${removeBtn}${imageHtml}<div style="flex:1;min-width:0;"><h3 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;">${escapeHtml(title || 'Product')}</h3>${desc ? `<p style="margin:0 0 0.75rem;font-size:0.85rem;line-height:1.4;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#243027;color:#fff;padding:0.5rem 1.25rem;border-radius:9999px;text-decoration:none;font-size:0.6rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.1em;">${escapeHtml(label)}</a></div></div>`
+      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" style="position:relative;margin:1.5rem 0;padding:1rem;border:1px solid #e5e7eb;border-radius:0.75rem;background:#fff;max-width:32rem;display:flex;gap:1rem;align-items:center;">${controls}${imageHtml}<div style="flex:1;min-width:0;"><h3 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;">${escapeHtml(title || 'Product')}</h3>${desc ? `<p style="margin:0 0 0.75rem;font-size:0.85rem;line-height:1.4;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#243027;color:#fff;padding:0.5rem 1.25rem;border-radius:9999px;text-decoration:none;font-size:0.6rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.1em;">${escapeHtml(label)}</a></div></div>`
     } else {
       const imageHtml = image
         ? `<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;"><img src="${escapeHtml(image)}" alt="${escapeHtml(title || 'Product')}" style="width:100%;height:auto;border-radius:0.5rem;object-fit:cover;max-height:200px;" /></a>`
         : ''
-      widget = `<div class="product-widget" style="position:relative;margin:1.5rem 0;max-width:24rem;">${removeBtn}${imageHtml}<div style="padding-top:0.75rem;"><h3 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;"><a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="color:#243027;text-decoration:none;">${escapeHtml(title || 'Product')}</a></h3>${desc ? `<p style="margin:0 0 0.5rem;font-size:0.9rem;line-height:1.5;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="color:#76885B;text-decoration:underline;font-size:0.8rem;font-weight:500;">${escapeHtml(label)} &rarr;</a></div></div>`
+      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" style="position:relative;margin:1.5rem 0;max-width:24rem;">${controls}${imageHtml}<div style="padding-top:0.75rem;"><h3 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;"><a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="color:#243027;text-decoration:none;">${escapeHtml(title || 'Product')}</a></h3>${desc ? `<p style="margin:0 0 0.5rem;font-size:0.9rem;line-height:1.5;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="color:#76885B;text-decoration:underline;font-size:0.8rem;font-weight:500;">${escapeHtml(label)} &rarr;</a></div></div>`
     }
 
-    if (savedRangeRef.current) {
+    if (isEdit && editTarget) {
+      editTarget.outerHTML = widget
+    } else if (savedRangeRef.current) {
       const range = savedRangeRef.current
       const fragment = document.createRange().createContextualFragment(widget)
       range.deleteContents()
@@ -211,10 +250,10 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={closeModal}>
-          <div className="w-full max-w-md rounded-2xl border border-[#243027]/15 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-[#243027]/15 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-[#243027]/10 px-6 py-4">
-              <h3 className="font-serif text-lg text-[#243027]">Insert Product Widget</h3>
+            <div className="flex shrink-0 items-center justify-between border-b border-[#243027]/10 px-6 py-4">
+              <h3 className="font-serif text-lg text-[#243027]">{isEdit ? 'Edit Product Widget' : 'Insert Product Widget'}</h3>
               <button
                 type="button"
                 onClick={closeModal}
@@ -226,7 +265,7 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
             </div>
 
             {/* Progress indicator */}
-            <div className="flex items-center justify-center gap-2 px-6 py-3">
+            <div className="flex shrink-0 items-center justify-center gap-2 px-6 py-3">
               {([1, 2, 3] as const).map((s) => (
                 <div key={s} className="flex items-center gap-2">
                   <div
@@ -246,7 +285,7 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
             </div>
 
             {/* Step content */}
-            <div className="px-6 py-4">
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
               {/* Step 1: Image */}
               {step === 1 && (
                 <div className="space-y-4">
@@ -404,9 +443,10 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
 
               {/* Step 3: Style */}
               {step === 3 && (
-                <div className="space-y-4">
-                  <p className="text-center text-xs text-[#243027]/50">Choose a widget layout style</p>
-                  <div className="grid grid-cols-3 gap-3">
+                <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_160px]">
+                  <div className="min-w-0 md:order-2">
+                    <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#243027]/50">Layout style</p>
+                    <div className="grid grid-cols-3 gap-3 md:grid-cols-1">
                     {([
                       { key: 'card', label: 'Card' },
                       { key: 'banner', label: 'Banner' },
@@ -449,9 +489,10 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
                         <span className="text-[10px] font-bold uppercase tracking-wider text-[#243027]/70">{s.label}</span>
                       </button>
                     ))}
+                    </div>
                   </div>
 
-                  <div>
+                  <div className="min-w-0 md:order-1">
                     <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#243027]/50">Preview</p>
                     <div className="rounded-lg border border-[#243027]/10 bg-[#F8F7F4] p-4">
                       {widgetStyle === 'card' && (
@@ -502,7 +543,7 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
             </div>
 
             {/* Footer navigation */}
-            <div className="flex items-center justify-between border-t border-[#243027]/10 px-6 py-4">
+            <div className="flex shrink-0 items-center justify-between border-t border-[#243027]/10 px-6 py-4">
               <button
                 type="button"
                 onClick={() => (step === 1 ? closeModal() : setStep((step - 1) as 1 | 2 | 3))}
@@ -535,7 +576,7 @@ export function ProductWidgetPopover({ editorRef, onChange }: ProductWidgetPopov
                   onClick={() => apply()}
                   className="rounded-full bg-[#243027] px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#76885B]"
                 >
-                  Insert Widget
+                  {isEdit ? 'Update Widget' : 'Insert Widget'}
                 </button>
               )}
             </div>
