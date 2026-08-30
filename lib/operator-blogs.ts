@@ -1,7 +1,6 @@
 import { supabaseAdmin } from './supabase'
 import { type BlogPost, createBlogPost, getAllBlogsForAdmin } from './blogs'
 import { signHandoff } from './operator-handoff'
-import crypto from 'crypto'
 
 export interface OperatorPost {
   id: string
