@@ -89,14 +89,16 @@ export function ProductWidgetPopover({ editorRef, onChange, editingWidget, onClo
     const img = widget.querySelector('img')
     const h3 = widget.querySelector('h3')
     const p = widget.querySelector('p')
-    const link = widget.querySelector('a[href]') as HTMLAnchorElement | null
-    const ctaText = link?.textContent?.replace(/\s*→\s*$/, '').trim() || link?.textContent?.trim() || ''
+    const ctaLink =
+      (widget.querySelector('a.product-widget-cta') as HTMLAnchorElement | null) ||
+      (widget.querySelector('a[href]') as HTMLAnchorElement | null)
+    const ctaText = ctaLink?.textContent?.replace(/\s*→\s*$/, '').trim() || ctaLink?.textContent?.trim() || ''
 
     setImageUrl(img?.getAttribute('src') || '')
     setName(h3?.textContent || '')
     setDescription(p?.textContent || '')
     setCtaLabel(widget.getAttribute('data-cta') || ctaText || 'Shop Now')
-    setDestinationUrl(link?.getAttribute('href') || '')
+    setDestinationUrl(widget.getAttribute('data-dest') || ctaLink?.getAttribute('href') || '')
     setWidgetStyle((widget.getAttribute('data-style') as WidgetStyle) || 'card')
     setPickerTab('upload')
     setError('')
@@ -206,19 +208,19 @@ export function ProductWidgetPopover({ editorRef, onChange, editingWidget, onClo
 
     if (widgetStyle === 'card') {
       const imageHtml = image
-        ? `<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;"><img src="${escapeHtml(image)}" alt="${escapeHtml(title || 'Product')}" style="width:100%;height:auto;border-radius:0.75rem;object-fit:cover;aspect-ratio:1/1;" /></a>`
+        ? `<a class="product-widget-link" href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;"><img src="${escapeHtml(image)}" alt="${escapeHtml(title || 'Product')}" style="width:100%;height:auto;border-radius:0.75rem;object-fit:cover;aspect-ratio:1/1;" /></a>`
         : ''
-      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" style="position:relative;margin:1.5rem 0;padding:1.25rem;border:1px solid #e5e7eb;border-radius:1rem;background:#fff;max-width:24rem;">${controls}${imageHtml}<div style="padding-top:1rem;"><h3 style="margin:0 0 0.5rem;font-size:1.25rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;">${escapeHtml(title || 'Product')}</h3>${desc ? `<p style="margin:0 0 1rem;font-size:0.95rem;line-height:1.5;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#243027;color:#fff;padding:0.75rem 1.5rem;border-radius:9999px;text-decoration:none;font-size:0.65rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.12em;transition:opacity 0.2s;">${escapeHtml(label)}</a></div></div>`
+      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" data-dest="${escapeHtml(destHref)}" style="position:relative;margin:1.5rem 0;padding:1.25rem;border:1px solid #e5e7eb;border-radius:1rem;background:#fff;max-width:24rem;">${controls}${imageHtml}<div style="padding-top:1rem;"><h3 style="margin:0 0 0.5rem;font-size:1.25rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;">${escapeHtml(title || 'Product')}</h3>${desc ? `<p style="margin:0 0 1rem;font-size:0.95rem;line-height:1.5;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a class="product-widget-cta product-widget-link" href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#243027;color:#fff;padding:0.75rem 1.5rem;border-radius:9999px;text-decoration:none;font-size:0.65rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.12em;transition:opacity 0.2s;">${escapeHtml(label)}</a></div></div>`
     } else if (widgetStyle === 'banner') {
       const imageHtml = image
         ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title || 'Product')}" style="width:120px;height:120px;border-radius:0.5rem;object-fit:cover;flex-shrink:0;" />`
         : ''
-      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" style="position:relative;margin:1.5rem 0;padding:1rem;border:1px solid #e5e7eb;border-radius:0.75rem;background:#fff;max-width:32rem;display:flex;gap:1rem;align-items:center;">${controls}${imageHtml}<div style="flex:1;min-width:0;"><h3 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;">${escapeHtml(title || 'Product')}</h3>${desc ? `<p style="margin:0 0 0.75rem;font-size:0.85rem;line-height:1.4;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#243027;color:#fff;padding:0.5rem 1.25rem;border-radius:9999px;text-decoration:none;font-size:0.6rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.1em;">${escapeHtml(label)}</a></div></div>`
+      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" data-dest="${escapeHtml(destHref)}" style="position:relative;margin:1.5rem 0;padding:1rem;border:1px solid #e5e7eb;border-radius:0.75rem;background:#fff;max-width:32rem;display:flex;gap:1rem;align-items:center;">${controls}${imageHtml}<div style="flex:1;min-width:0;"><h3 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;">${escapeHtml(title || 'Product')}</h3>${desc ? `<p style="margin:0 0 0.75rem;font-size:0.85rem;line-height:1.4;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a class="product-widget-cta product-widget-link" href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#243027;color:#fff;padding:0.5rem 1.25rem;border-radius:9999px;text-decoration:none;font-size:0.6rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.1em;">${escapeHtml(label)}</a></div></div>`
     } else {
       const imageHtml = image
-        ? `<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;"><img src="${escapeHtml(image)}" alt="${escapeHtml(title || 'Product')}" style="width:100%;height:auto;border-radius:0.5rem;object-fit:cover;max-height:200px;" /></a>`
+        ? `<a class="product-widget-link" href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;"><img src="${escapeHtml(image)}" alt="${escapeHtml(title || 'Product')}" style="width:100%;height:auto;border-radius:0.5rem;object-fit:cover;max-height:200px;" /></a>`
         : ''
-      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" style="position:relative;margin:1.5rem 0;max-width:24rem;">${controls}${imageHtml}<div style="padding-top:0.75rem;"><h3 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;"><a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="color:#243027;text-decoration:none;">${escapeHtml(title || 'Product')}</a></h3>${desc ? `<p style="margin:0 0 0.5rem;font-size:0.9rem;line-height:1.5;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="color:#76885B;text-decoration:underline;font-size:0.8rem;font-weight:500;">${escapeHtml(label)} &rarr;</a></div></div>`
+      widget = `<div class="product-widget" data-style="${widgetStyle}" data-cta="${escapeHtml(label)}" data-dest="${escapeHtml(destHref)}" style="position:relative;margin:1.5rem 0;max-width:24rem;">${controls}${imageHtml}<div style="padding-top:0.75rem;"><h3 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:600;color:#243027;font-family:Georgia,serif;line-height:1.2;"><a class="product-widget-link" href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="color:#243027;text-decoration:none;">${escapeHtml(title || 'Product')}</a></h3>${desc ? `<p style="margin:0 0 0.5rem;font-size:0.9rem;line-height:1.5;color:#243027b3;">${escapeHtml(desc)}</p>` : ''}<a class="product-widget-cta product-widget-link" href="${escapeHtml(destHref)}" target="_blank" rel="noopener noreferrer" style="color:#76885B;text-decoration:underline;font-size:0.8rem;font-weight:500;">${escapeHtml(label)} &rarr;</a></div></div>`
     }
 
     if (isEdit && editTarget) {

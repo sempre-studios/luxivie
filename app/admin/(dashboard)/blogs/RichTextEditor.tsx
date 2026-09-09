@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { LinkPopover } from './LinkPopover'
 import { ProductWidgetPopover } from './ProductWidgetPopover'
+import { ProductWidgetBulkEdit } from './ProductWidgetBulkEdit'
 import { MediaPicker } from './MediaPicker'
 
 interface RichTextEditorProps {
@@ -173,6 +174,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           editingWidget={editingProductWidget}
           onCloseEdit={() => setEditingProductWidget(null)}
         />
+        <ProductWidgetBulkEdit editorRef={editorRef} onChange={handleInput} />
       </div>
 
       {/* Editable area */}
