@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Script from "next/script"
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { CartProvider } from "@/contexts/CartContext"
@@ -56,6 +57,18 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning className="font-sans antialiased">
         <CartProvider>{children}</CartProvider>
+        {/* Google tag (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-5TVWENG3W2"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'G-5TVWENG3W2');`}
+        </Script>
       </body>
     </html>
   )
