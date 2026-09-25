@@ -7,6 +7,15 @@ import { SocialLinks } from "@/components/luxivie-landing/SocialLinks"
 
 export const dynamic = "force-dynamic"
 
+function siteUrl(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.luxivie.ca").replace(/\/$/, "")
+}
+
+function absoluteImageUrl(url: string): string {
+  if (/^https?:\/\//i.test(url)) return url
+  return `${siteUrl()}${url.startsWith("/") ? url : `/${url}`}`
+}
+
 interface BlogPostPageProps {
   params: Promise<{ id: string }>
 }
@@ -15,9 +24,38 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params
   const post = await getBlogBySlug(id)
   if (!post) return { title: 'Journal' }
+
+  const canonical = `${siteUrl()}/blog/${post.slug}`
+  const description = post.excerpt || post.seoDescription || undefined
+  const imageUrl = post.image_url
+    ? absoluteImageUrl(post.image_url)
+    : `${siteUrl()}/luxivie-logo.png`
+
   return {
     title: post.seoTitle || post.title,
     description: post.seoDescription || post.excerpt || undefined,
+    alternates: { canonical },
+    openGraph: {
+      title: post.title,
+      description,
+      url: canonical,
+      siteName: "Luxivie",
+      type: "article",
+      publishedTime: post.publishedAt,
+      authors: post.author ? [post.author] : undefined,
+      images: [
+        {
+          url: imageUrl,
+          alt: post.image_url ? `Hero image for ${post.title}` : "Luxivie",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      images: [imageUrl],
+    },
   }
 }
 

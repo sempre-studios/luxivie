@@ -20,6 +20,9 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.luxivie.ca"
+  ),
   title: "Luxivie — Botanical Hair Care",
   description:
     "Redefining hair health with botanical potency. Scientific performance meets Earth's raw ingredients.",
