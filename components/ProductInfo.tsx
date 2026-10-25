@@ -50,6 +50,25 @@ export function ProductInfo({
     );
   };
 
+  const getAmazonUrl = (productName: string) => {
+    const normalized = productName.toLowerCase();
+    if (normalized.includes("biotin") && normalized.includes("conditioner")) {
+      return "https://www.amazon.ca/Luxivie-Conditioner-Fortifying-Nourishing-Fuller-Looking/dp/B0G6XKF4N5/";
+    }
+    if (normalized.includes("rosemary mint shampoo") && normalized.includes("conditioner")) {
+      return "https://www.amazon.ca/Luxivie-Conditioner-Clarifying-Lightweight-Fuller-Looking/dp/B0G5SDZNB7";
+    }
+    if (normalized.includes("rosemary hair oil")) {
+      return "https://www.amazon.ca/Luxivie-Rosemary-Hair-3-38-Healthy-Looking/dp/B0FJYHPHBG";
+    }
+    if (normalized.includes("rosemary") && (normalized.includes("serum") || normalized.includes("scalp serum"))) {
+      return "https://www.amazon.ca/Luxivie-Rosemary-Peppermint-Castor-Lightweight/dp/B0DZNDJ8XV";
+    }
+    return null;
+  };
+
+  const amazonUrl = getAmazonUrl(name);
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Badges */}
@@ -196,32 +215,44 @@ export function ProductInfo({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
-        className="flex gap-2 md:gap-3 pt-2"
+        className="space-y-3 pt-2"
       >
-        <Button
-          onClick={handleAddToCart}
-          className="flex-1 h-11 md:h-12 bg-[#BFC8B3] hover:bg-[#A8B19D] text-white text-sm md:text-base"
-        >
-          <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-          Add to Cart
-        </Button>
-        <Button
-          onClick={() => setIsFavorited(!isFavorited)}
-          variant="outline"
-          className={`h-11 md:h-12 w-11 md:w-12 ${
-            isFavorited
-              ? "bg-[#BFC8B3]/10 border-[#BFC8B3] text-[#BFC8B3]"
-              : "border-gray-300"
-          }`}
-          aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-        >
-          <Heart
-            className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? "fill-[#BFC8B3]" : ""}`}
-          />
-        </Button>
-        <Button variant="outline" className="h-11 md:h-12 w-11 md:w-12 border-gray-300" aria-label="Share product">
-          <Share2 className="w-4 h-4 md:w-5 md:h-5" />
-        </Button>
+        {amazonUrl && (
+          <a
+            href={amazonUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex h-11 md:h-12 w-full items-center justify-center rounded-md bg-[#1b2d24] px-6 text-sm md:text-base font-medium text-white transition-colors hover:bg-[#c97c5d]"
+          >
+            Buy on Amazon.ca
+          </a>
+        )}
+        <div className="flex gap-2 md:gap-3">
+          <Button
+            onClick={handleAddToCart}
+            className="flex-1 h-11 md:h-12 bg-[#BFC8B3] hover:bg-[#A8B19D] text-white text-sm md:text-base"
+          >
+            <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+            Add to Cart
+          </Button>
+          <Button
+            onClick={() => setIsFavorited(!isFavorited)}
+            variant="outline"
+            className={`h-11 md:h-12 w-11 md:w-12 ${
+              isFavorited
+                ? "bg-[#BFC8B3]/10 border-[#BFC8B3] text-[#BFC8B3]"
+                : "border-gray-300"
+            }`}
+            aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Heart
+              className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? "fill-[#BFC8B3]" : ""}`}
+            />
+          </Button>
+          <Button variant="outline" className="h-11 md:h-12 w-11 md:w-12 border-gray-300" aria-label="Share product">
+            <Share2 className="w-4 h-4 md:w-5 md:h-5" />
+          </Button>
+        </div>
       </motion.div>
 
       {/* Key Features */}

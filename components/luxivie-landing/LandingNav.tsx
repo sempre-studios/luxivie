@@ -3,7 +3,46 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
+import { motion, useReducedMotion } from "framer-motion"
+
+interface ScrollRevealProps {
+  children: ReactNode
+  className?: string
+  delay?: number
+  y?: number
+  scale?: number
+}
+
+export function ScrollReveal({
+  children,
+  className,
+  delay = 0,
+  y = 18,
+  scale = 1,
+}: ScrollRevealProps) {
+  const prefersReducedMotion = useReducedMotion()
+
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>
+  }
+
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y, scale }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.15, margin: "0px 0px -40px 0px" }}
+      transition={{
+        duration: 0.75,
+        delay,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 const NAV_LINKS = [
   { id: "products", label: "Products" },
@@ -116,10 +155,10 @@ export function LandingNav() {
             </>
           ) : (
             <Link
-              href="/blog"
+              href="/"
               className="rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
             >
-              Journal
+              Home
             </Link>
           )}
         </div>
@@ -177,11 +216,11 @@ export function LandingNav() {
               </>
             ) : (
               <Link
-                href="/blog"
+                href="/"
                 className="inline-flex w-fit rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
                 onClick={closeMenu}
               >
-                Journal
+                Home
               </Link>
             )}
           </div>
