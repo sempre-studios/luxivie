@@ -113,7 +113,7 @@ export function LandingNav() {
 
   return (
     <>
-      <nav className="fixed inset-x-0 top-0 z-[100] flex w-full items-center justify-between border-b border-lux-text/10 bg-lux-background/95 px-4 py-5 backdrop-blur-md sm:px-12">
+      <nav className="fixed inset-x-0 top-0 z-[100] flex w-full items-center justify-between border-b border-lux-text/10 bg-lux-background/95 px-6 py-4 backdrop-blur-md sm:px-12">
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
             <Image
@@ -129,7 +129,7 @@ export function LandingNav() {
 
         <button
           type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-lux-text/20 text-lux-text md:hidden"
+          className="flex h-10 w-10 items-center justify-center text-lux-text md:hidden"
           aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={isOpen}
           aria-controls="mobile-nav-overlay"
@@ -138,7 +138,7 @@ export function LandingNav() {
           <i className={`ph ${isOpen ? "ph-x" : "ph-list"} text-xl`} aria-hidden />
         </button>
 
-        <div className="hidden min-w-0 flex-1 items-center justify-end gap-8 text-[11px] font-bold uppercase tracking-[0.2em] md:flex">
+        <div className="hidden min-w-0 flex-1 items-center justify-end gap-8 text-xs font-medium tracking-[0.04em] md:flex">
           {!isBlogSection ? (
             <>
               {NAV_LINKS.map(({ id, label }) => (
@@ -148,7 +148,7 @@ export function LandingNav() {
               ))}
               <Link
                 href="/blog"
-                className="rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
+                className="border-b border-lux-text/40 pb-1 transition-colors hover:border-lux-accent hover:text-lux-accent"
               >
                 Journal
               </Link>
@@ -156,7 +156,7 @@ export function LandingNav() {
           ) : (
             <Link
               href="/"
-              className="rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
+              className="border-b border-lux-text/40 pb-1 transition-colors hover:border-lux-accent hover:text-lux-accent"
             >
               Home
             </Link>
@@ -190,7 +190,7 @@ export function LandingNav() {
             </Link>
             <button
               type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-lux-text/20"
+              className="flex h-9 w-9 items-center justify-center"
               aria-label="Close navigation menu"
               onClick={closeMenu}
             >
@@ -198,7 +198,7 @@ export function LandingNav() {
             </button>
           </div>
 
-          <div className="flex flex-col gap-5 text-sm font-bold uppercase tracking-[0.2em]">
+          <div className="flex flex-col gap-6 text-base font-medium">
             {!isBlogSection ? (
               <>
                 {NAV_LINKS.map(({ id, label }) => (
@@ -208,7 +208,7 @@ export function LandingNav() {
                 ))}
                 <Link
                   href="/blog"
-                  className="inline-flex w-fit rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
+                  className="inline-flex w-fit border-b border-lux-text/40 pb-1 transition-colors hover:text-lux-accent"
                   onClick={closeMenu}
                 >
                   Journal
@@ -217,7 +217,7 @@ export function LandingNav() {
             ) : (
               <Link
                 href="/"
-                className="inline-flex w-fit rounded-full bg-lux-accent px-4 py-2 text-white transition-all hover:brightness-110"
+                className="inline-flex w-fit border-b border-lux-text/40 pb-1 transition-colors hover:text-lux-accent"
                 onClick={closeMenu}
               >
                 Home
