@@ -55,10 +55,10 @@ function productPageHref(product: LandingProduct) {
 type LuxivieLandingPageProps = { products: LandingProduct[] }
 
 const primaryButton =
-  "inline-flex min-h-12 items-center justify-center rounded-sm bg-lux-text px-7 py-3 text-center text-xs font-semibold tracking-[0.04em] text-white transition-colors hover:bg-lux-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lux-accent"
+  "inline-flex min-h-12 items-center justify-center rounded-lg bg-lux-text px-7 py-3 text-center text-xs font-semibold tracking-[0.04em] text-white transition-colors hover:bg-lux-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lux-accent"
 
 const secondaryButton =
-  "inline-flex min-h-12 items-center justify-center rounded-sm border border-lux-text/25 px-7 py-3 text-center text-xs font-semibold tracking-[0.04em] text-lux-text transition-colors hover:border-lux-text hover:bg-lux-text hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lux-accent"
+  "inline-flex min-h-12 items-center justify-center rounded-lg border border-lux-text/25 px-7 py-3 text-center text-xs font-semibold tracking-[0.04em] text-lux-text transition-colors hover:border-lux-text hover:bg-lux-text hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lux-accent"
 
 export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
   const rosemaryMint = findProductByKeywords(products, ["rosemary mint", "shampoo"], 0)
@@ -96,8 +96,8 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
                   { product: rosemaryMint, label: "Oily hair", href: "#rosemary-mint" },
                   { product: biotinKeratin, label: "Normal-to-dry hair", href: "#biotin-keratin" },
                 ].map(({ product, label, href }) => (
-                  <a key={label} href={href} className="group border border-lux-text/10 bg-white p-3 transition-colors hover:border-lux-text/35">
-                    <div className="aspect-[4/5] bg-lux-sand/25 p-4">
+                  <a key={label} href={href} className="group rounded-xl border border-lux-text/10 bg-white p-3 transition-colors hover:border-lux-text/35">
+                    <div className="aspect-[4/5] rounded-lg bg-lux-sand/25 p-4">
                       <img src={product.image_url} alt={product.name} className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]" />
                     </div>
                     <p className="px-2 pb-2 pt-4 text-center text-xs text-lux-text/60">{label}</p>
@@ -113,14 +113,14 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
             <ScrollReveal y={14}>
               <h2 className="mb-12 font-serif text-4xl tracking-[-0.025em] sm:text-5xl">What would you like help with?</h2>
             </ScrollReveal>
-            <div className="grid border-t border-lux-text/15 md:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-3">
               {[
                 ["Oily roots", "Explore Rosemary Mint", "#rosemary-mint", "rosemary-mint"],
                 ["Normal-to-dry hair", "Explore Biotin + Keratin", "#biotin-keratin", "biotin-keratin"],
                 ["Dry-looking ends", "Explore Rosemary Hair Oil", "#rosemary-oil", "rosemary-oil"],
               ].map(([title, cta, href, product], index) => (
                 <ScrollReveal key={title} delay={index * 0.06} y={12}>
-                  <TrackedLink href={href} event="concern_select" section="find-your-routine" product={product} className="group block min-h-36 border-b border-lux-text/15 px-1 py-7 transition-colors hover:bg-lux-background focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lux-accent md:px-6">
+                  <TrackedLink href={href} event="concern_select" section="find-your-routine" product={product} className="group block min-h-36 rounded-lg border border-lux-text/15 px-6 py-7 transition-colors hover:bg-lux-background focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lux-accent">
                     <h3 className="font-serif text-2xl">{title}</h3>
                     <span className="mt-6 inline-flex items-center gap-2 text-xs font-medium text-lux-text/60 transition-colors group-hover:text-lux-accent">{cta}<i className="ph ph-arrow-down" aria-hidden /></span>
                   </TrackedLink>
@@ -144,8 +144,8 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
             </div>
 
             <ScrollReveal y={16}>
-              <article id="rosemary-oil" className="mt-16 scroll-mt-28 grid items-center gap-10 border-t border-lux-text/15 pt-12 md:grid-cols-[.7fr_1.3fr] lg:gap-20">
-                <div className="aspect-square bg-white p-6">
+              <article id="rosemary-oil" className="mt-16 scroll-mt-28 grid items-center gap-10 rounded-xl border border-lux-text/15 p-6 md:grid-cols-[.7fr_1.3fr] lg:gap-20 lg:p-10">
+                <div className="aspect-square rounded-lg bg-white p-6">
                   <img src={rosemaryOil.image_url} alt={rosemaryOil.name} className="h-full w-full object-contain" />
                 </div>
                 <div>
@@ -224,7 +224,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
             <div className="mt-10 grid gap-5 md:grid-cols-2">
               {HAIR_CARE_GUIDES.map((guide, index) => (
                 <ScrollReveal key={guide.href} delay={index * 0.06} y={10}>
-                  <TrackedLink href={guide.href} event="guide_click" section="guides" product={guide.title} className="group block border-t border-lux-text/20 px-1 py-7 transition-colors hover:border-lux-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lux-accent">
+                  <TrackedLink href={guide.href} event="guide_click" section="guides" product={guide.title} className="group block rounded-lg border border-lux-text/15 px-6 py-7 transition-colors hover:border-lux-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lux-accent">
                     <p className="text-xs text-lux-text/55">{guide.eyebrow}</p>
                     <h3 className="mt-4 flex items-end justify-between gap-8 font-serif text-2xl sm:text-3xl">{guide.title}<i className="ph ph-arrow-up-right shrink-0 text-xl transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" aria-hidden /></h3>
                   </TrackedLink>
@@ -237,7 +237,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
         <section className="bg-lux-text px-6 py-20 text-lux-background sm:px-12 sm:py-24">
           <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-8 md:flex-row md:items-center">
             <h2 className="font-serif text-4xl tracking-[-0.025em] sm:text-5xl">Find the routine that fits your hair.</h2>
-            <a href="#find-your-routine" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-sm bg-lux-background px-8 py-3 text-xs font-semibold tracking-[0.04em] text-lux-text transition-colors hover:bg-lux-accent hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">Find my routine</a>
+            <a href="#find-your-routine" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-lg bg-lux-background px-8 py-3 text-xs font-semibold tracking-[0.04em] text-lux-text transition-colors hover:bg-lux-accent hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">Find my routine</a>
           </div>
         </section>
       </main>
@@ -275,8 +275,8 @@ type RoutineCardProps = {
 function RoutineCard({ id, eyebrow, title, size, description, note, product, amazonHref }: RoutineCardProps) {
   return (
     <ScrollReveal y={16}>
-      <article id={id} className="scroll-mt-28 border-t border-lux-text/20 pt-5">
-        <div className="aspect-[4/3] bg-white p-6">
+      <article id={id} className="scroll-mt-28 rounded-xl border border-lux-text/15 p-5 sm:p-6">
+        <div className="aspect-[4/3] rounded-lg bg-white p-6">
           <img src={product.image_url} alt={product.name} className="h-full w-full object-contain" />
         </div>
         <div className="px-1 pt-7 sm:px-2">
