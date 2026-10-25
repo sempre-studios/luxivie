@@ -17,22 +17,22 @@ export type LandingProduct = {
 export const FALLBACK_PRODUCTS: LandingProduct[] = [
   {
     id: "b3233319-90ff-417f-b329-1cb0774e80d4",
-    name: "Rosemary Mint Shampoo and Conditioner",
+    name: "Rosemary Mint Shampoo & Conditioner Set",
     price: 39.99,
     image_url:
       "https://kvirwlcodrpwnwzvfcqr.supabase.co/storage/v1/object/public/gallery/7fca71ec-1a2f-406b-906f-5154356620af/1765851197495-27.png",
     benefits: [
-      "Gently cleanses and refreshes with a rich lather",
-      "Adds body for hair that looks fuller and feels stronger",
-      "Helps reduce the look of dryness and split ends",
+      "A fresh, clean feel for oily-hair needs",
+      "Conditioning for manageability",
+      "A straightforward two-step routine",
     ],
     description:
-      "Complete cleansing + conditioning routine that leaves hair feeling fresh, soft, and shiny with a fuller-looking finish. Shampoo gently cleanses and refreshes while adding body and lift, helping hair look thicker and more voluminous without feeling heavy. Conditioner moisturizes and smooths for better manageability and healthy-looking shine; helps reduce split ends.",
+      "When your roots look oily soon after washing, choosing the right routine matters. This Rosemary Mint duo pairs cleansing with conditioning for a fresh, clean feel and manageable hair. Designed for oily hair. Not recommended for dry hair.",
     status: "active",
-    is_bestseller: true,
-    rating: 4.9,
-    review_count: 840,
-    badges: ["Bestseller"],
+    is_bestseller: false,
+    rating: null,
+    review_count: 0,
+    badges: ["For oily hair", "Sulfate-free & paraben-free"],
   },
   {
     id: "a8307850-3fff-4749-9a0c-7c65105f3595",
@@ -60,36 +60,36 @@ export const FALLBACK_PRODUCTS: LandingProduct[] = [
     image_url:
       "https://kvirwlcodrpwnwzvfcqr.supabase.co/storage/v1/object/public/gallery/7fca71ec-1a2f-406b-906f-5154356620af/1766714531701-Luxivie-Rosemary-Hair-Oil-100mL.jpg",
     benefits: [
-      "Adds Shine and Smoothness",
-      "Enhances Fuller Looking Hair",
-      "Improves the Look of Dry Hair",
+      "Added softness for dry-looking lengths and ends",
+      "A shinier, more polished finish",
+      "Targeted application where extra care is needed",
     ],
     description:
-      "A lightweight blend of 100% natural oils for shine and softness. It helps smooth the appearance of dry or rough hair and reduce the look of split ends for healthier-looking strands. Can be used on the scalp, as a leave-in, or before shampooing. Lightweight texture absorbs quickly and suits all hair types.",
+      "When your lengths or ends look dry or dull, a targeted finishing step may be all you need. Luxivie Rosemary Hair Oil helps add softness and shine for a nourished, healthy-looking appearance.",
     status: "active",
     is_bestseller: false,
-    rating: 4.8,
-    review_count: 320,
-    badges: ["Botanical Oil"],
+    rating: null,
+    review_count: 0,
+    badges: ["For dry-looking lengths & ends"],
   },
   {
     id: "4dd292f9-f700-4732-a65a-ac55157125e9",
-    name: "Biotin Shampoo Conditioner with Keratin",
+    name: "Biotin + Keratin Shampoo & Conditioner Set",
     price: 39.99,
     image_url:
       "https://kvirwlcodrpwnwzvfcqr.supabase.co/storage/v1/object/public/gallery/7fca71ec-1a2f-406b-906f-5154356620af/1766714944700-luxivie-biotin-keratin-shampoo-conditioner.png",
     benefits: [
-      "Adds body for a fuller-looking finish.",
-      "Softens and smoothens for easier detangling",
-      "Leaves hair looking polished and refreshed",
+      "Softness and manageability",
+      "A nourished appearance",
+      "Healthy-looking hair",
     ],
     description:
-      "Biotin & Keratin Care for Fuller-Looking, Healthier-Looking Hair. Fortifies hair’s look and feel while adding body for a fuller-looking finish. Conditioner helps soften and smooth for easier detangling and improved manageability. Sulfate & paraben free, designed for regular use and most hair types.",
+      "When your hair feels dry, rough or difficult to manage, start with a routine matched to those needs. This Biotin + Keratin duo cleanses and conditions for nourished, manageable and healthy-looking hair. Designed for normal-to-dry hair.",
     status: "active",
     is_bestseller: false,
-    rating: 5,
-    review_count: 1240,
-    badges: ["Intensive Care"],
+    rating: null,
+    review_count: 0,
+    badges: ["For normal-to-dry hair", "Sulfate-free & paraben-free"],
   },
 ]
 

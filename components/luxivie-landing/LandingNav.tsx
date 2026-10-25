@@ -45,9 +45,9 @@ export function ScrollReveal({
 }
 
 const NAV_LINKS = [
-  { id: "products", label: "Products" },
-  { id: "ritual",   label: "Ritual" },
-  { id: "sustainability", label: "Sustainability" },
+  { id: "find-your-routine", label: "Find your routine" },
+  { id: "products", label: "Our products" },
+  { id: "guides", label: "Hair care guides" },
 ] as const
 
 export function LandingNav() {

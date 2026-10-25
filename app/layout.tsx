@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "https://www.luxivie.ca"
   ),
-  title: "Luxivie — Botanical Hair Care",
+  title: "Luxivie — Hair Care for Your Routine",
   description:
-    "Redefining hair health with botanical potency. Scientific performance meets Earth's raw ingredients.",
+    "Choose Luxivie hair care for oily roots, normal-to-dry hair, or dry-looking lengths and ends.",
 }
 
 export default function RootLayout({
