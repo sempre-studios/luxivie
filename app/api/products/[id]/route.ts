@@ -2,54 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { FALLBACK_PRODUCTS } from '@/lib/landing-products';
 
-function defaultIngredientsForProduct(name: string): string[] {
-  const n = name.toLowerCase();
-  if (n.includes('rosemary mint shampoo') && n.includes('conditioner')) {
-    return [
-      'Rosmarinus Officinalis (Rosemary) Leaf Oil — Clarifies the scalp and supports fuller-looking hair',
-      'Mentha Piperita (Peppermint) Oil — Refreshes roots with a clean, cooling sensation',
-      'Aloe Barbadensis Leaf Juice — Hydrates and soothes without weighing hair down',
-      'Hydrolyzed Plant Proteins — Adds natural body, lift, and shine',
-      'Panthenol (Pro-Vitamin B5) — Smooths the hair cuticle and helps reduce split ends',
-    ];
-  }
-  if (n.includes('biotin') && n.includes('keratin')) {
-    return [
-      'Biotin (Vitamin B7) — Fortifies hair strands to support a fuller, healthier-looking finish',
-      'Hydrolyzed Keratin — Smooths rough cuticles and improves detangling and manageability',
-      'Argania Spinosa (Argan) Kernel Oil — Nourishes dry, brittle strands with lightweight softness',
-      'Panthenol (Pro-Vitamin B5) — Locks in moisture for a polished, frizz-controlled look',
-      'Botanical Conditioning Complex — Sulfate-free and paraben-free care gentle enough for daily use',
-    ];
-  }
-  if (n.includes('rosemary hair oil')) {
-    return [
-      'Rosmarinus Officinalis (Rosemary) Leaf Oil — Nourishes scalp and strands for fuller-looking hair',
-      'Ricinus Communis (Castor) Seed Oil — Rich in fatty acids to smooth dry ends and add luster',
-      'Simmondsia Chinensis (Jojoba) Seed Oil — Lightweight botanical oil that mimics natural scalp lipids',
-      'Argania Spinosa (Argan) Kernel Oil — Softens rough texture and enhances mirror-like shine',
-      'Tocopherol (Vitamin E) — Antioxidant support to protect hair softness and vitality',
-    ];
-  }
-  return [
-    'Rosmarinus Officinalis (Rosemary) Leaf Oil',
-    'Mentha Piperita (Peppermint) Oil',
-    'Ricinus Communis (Castor) Seed Oil',
-    'Olea Europaea (Olive) Fruit Oil',
-  ];
-}
-
-function defaultHowToUseForProduct(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes('shampoo') && n.includes('conditioner')) {
-    return '1. Wet hair thoroughly with warm water. Massage shampoo into the scalp for 60 seconds to lift buildup, then rinse clean.\n2. Apply conditioner from mid-lengths to ends. Leave on for 2–3 minutes to detangle and smooth, then rinse thoroughly with cool or lukewarm water.';
-  }
-  if (n.includes('rosemary hair oil')) {
-    return '1. As a pre-wash scalp treatment: Apply a few drops to the scalp, massage gently for 2–3 minutes, and leave on for 30 minutes before shampooing.\n2. As a finishing oil: Warm 1–3 drops between your palms and smooth over damp or dry mid-lengths and ends to seal in shine and tame frizz.';
-  }
-  return 'Apply 2–4 drops to damp or dry hair and scalp. Massage gently with fingertips and style as usual.';
-}
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -74,8 +26,8 @@ export async function GET(
           product: {
             ...fallback,
             images: fallback.image_url ? [fallback.image_url] : [],
-            ingredients: defaultIngredientsForProduct(fallback.name),
-            how_to_use: defaultHowToUseForProduct(fallback.name),
+            ingredients: [],
+            how_to_use: '',
             sizes: [],
             original_price: null,
           },
@@ -105,8 +57,8 @@ export async function GET(
           product: {
             ...fallback,
             images: fallback.image_url ? [fallback.image_url] : [],
-            ingredients: defaultIngredientsForProduct(fallback.name),
-            how_to_use: defaultHowToUseForProduct(fallback.name),
+            ingredients: [],
+            how_to_use: '',
             sizes: [],
             original_price: null,
           },
@@ -143,7 +95,7 @@ export async function GET(
     }
 
     // Get main image URL (from product.image_url)
-    const mainImageUrl = product.image_url || ''
+    const mainImageUrl = product.image_url?.startsWith('blob:') ? '' : product.image_url || ''
     
     // Remove duplicates from imageUrls first
     const uniqueImageUrls: string[] = []
@@ -184,10 +136,10 @@ export async function GET(
         : [],
       status: product.status || 'active',
       description: product.description || '',
-      ingredients: product.ingredients && Array.isArray(product.ingredients) && product.ingredients.length > 0
+      ingredients: product.ingredients && Array.isArray(product.ingredients)
         ? product.ingredients
-        : defaultIngredientsForProduct(product.name || ''),
-      how_to_use: product.how_to_use || defaultHowToUseForProduct(product.name || ''),
+        : [],
+      how_to_use: product.how_to_use || '',
       rating: product.rating ? parseFloat(String(product.rating)) : null,
       review_count: product.review_count || 0,
       sizes: product.sizes && Array.isArray(product.sizes)

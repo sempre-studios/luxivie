@@ -188,7 +188,7 @@ export function FinalCTA({ content }: FinalCTAProps = {}) {
                 <h4 className="text-gray-900 mb-4">Navigation</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li><Link href="/" className="hover:text-[#8B9A7F] transition-colors">Home</Link></li>
-                  <li><Link href="/products" className="hover:text-[#8B9A7F] transition-colors">All Products</Link></li>
+                  <li><Link href="/#products" className="hover:text-[#8B9A7F] transition-colors">All Products</Link></li>
                   <li><Link href="/blog" className="hover:text-[#8B9A7F] transition-colors">Blog</Link></li>
                 </ul>
               </motion.div>

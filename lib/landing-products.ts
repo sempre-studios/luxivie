@@ -20,7 +20,7 @@ export const FALLBACK_PRODUCTS: LandingProduct[] = [
     name: "Rosemary Mint Shampoo & Conditioner Set",
     price: 39.99,
     image_url:
-      "https://kvirwlcodrpwnwzvfcqr.supabase.co/storage/v1/object/public/gallery/7fca71ec-1a2f-406b-906f-5154356620af/1765851197495-27.png",
+      "https://kvirwlcodrpwnwzvfcqr.supabase.co/storage/v1/object/public/gallery/luxivie/gallery/rosemary-mint-shampoo-and-conditioner/1792964029751-Rosemary-Mint-Set.jpg",
     benefits: [
       "A fresh, clean feel for oily-hair needs",
       "Conditioning for manageability",
@@ -162,7 +162,9 @@ export async function getLandingProducts(
       id: product.id,
       name: product.name || "Product",
       price: product.price ? parseFloat(String(product.price)) : 0,
-      image_url: product.image_url || "",
+      image_url: product.image_url?.startsWith("blob:")
+        ? FALLBACK_PRODUCTS.find((fallback) => fallback.id === product.id)?.image_url || ""
+        : product.image_url || "",
       benefits: parseBenefits(product.benefits),
       description:
         typeof product.description === "string" ? product.description : "",

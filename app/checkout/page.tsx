@@ -93,7 +93,7 @@ export default function CheckoutPage() {
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href="/products" className="hover:text-[#8B9A7F] transition-colors">
+                                        <Link href="/#products" className="hover:text-[#8B9A7F] transition-colors">
                                             All Products
                                         </Link>
                                     </li>

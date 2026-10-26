@@ -49,7 +49,7 @@ function findProductByKeywords(products: LandingProduct[], keywords: string[], f
 }
 
 function productPageHref(product: LandingProduct) {
-  return product.id && product.id !== "fallback-empty" ? `/products/${product.id}` : "/products"
+  return product.id && product.id !== "fallback-empty" ? `/products/${product.id}` : "/#products"
 }
 
 type LuxivieLandingPageProps = { products: LandingProduct[] }
@@ -250,7 +250,7 @@ export function LuxivieLandingPage({ products }: LuxivieLandingPageProps) {
           </div>
           <div className="space-y-6 md:text-right">
             <nav className="flex flex-wrap gap-x-7 gap-y-3 text-xs font-medium tracking-[0.04em]">
-              <Link href="/products" className="hover:text-lux-accent">Where to buy</Link>
+              <Link href="/#products" className="hover:text-lux-accent">Where to buy</Link>
               <Link href="/blog" className="hover:text-lux-accent">Hair care guides</Link>
             </nav>
             <SocialLinks className="flex gap-4 md:justify-end" />

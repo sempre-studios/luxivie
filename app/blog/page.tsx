@@ -9,12 +9,6 @@ import { getPublishedBlogs } from "@/lib/blogs"
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=2070&auto=format&fit=crop"
 
-function formatDate(dateString?: string) {
-  if (!dateString) return "Winter 2025"
-  const d = new Date(dateString)
-  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
-}
-
 function estimateReadTime(html: string, readTime?: string) {
   if (readTime) return readTime
   const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
@@ -34,13 +28,9 @@ interface BlogPageProps {
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { category } = await searchParams
   const posts = await getPublishedBlogs()
-  const categories = [...new Set(posts.map((p) => p.category).filter(Boolean))]
+  const categories = [...new Set(posts.map((p) => p.category).filter((value): value is string => Boolean(value)))]
   const filteredPosts = category ? posts.filter((p) => p.category === category) : posts
   const list = filteredPosts.slice(0, 7)
-  const heroText =
-    posts[0]?.excerpt ||
-    "Nature never hurries, yet everything is accomplished. Our journal explores the slow philosophy of botanical beauty."
-
   return (
     <div className="m-0 min-h-screen w-full overflow-x-hidden bg-[#F2F0EB] p-0 text-[#243027]">
       <div
@@ -56,20 +46,18 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <header className="border-b border-[#243027]/5 px-8 pb-20 pt-40 lg:px-20">
         <div className="flex flex-col items-end justify-between gap-12 lg:flex-row">
           <div className="max-w-4xl">
-            <div className="mb-6 flex items-center gap-4">
-              <div className="h-px w-12 bg-[#76885B]" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-[#76885B]">The Botanical Archive</span>
-            </div>
-            <h1 className="mb-8 font-serif text-7xl leading-[0.9] tracking-tight lg:text-9xl">
-              Living <br /> <span className="pl-20 font-normal italic lg:pl-40">Well.</span>
+            <h1 className="mb-8 font-serif text-5xl leading-[1.1] tracking-[-0.035em] sm:text-6xl lg:text-7xl">
+              Living <br /> <span className="pl-20 italic lg:pl-40">Well.</span>
             </h1>
           </div>
           <div className="max-w-sm pb-4">
-            <p className="mb-6 text-base italic leading-relaxed text-[#243027]/60">&quot;{heroText}&quot;</p>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">Issue No. 04</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">•</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#76885B]">{posts[0] ? formatDate(posts[0].publishedAt) : "Winter 2025"}</span>
+            <p className="mb-6 text-base italic leading-[1.8] text-lux-text/65">
+              Thoughtful hair care guidance rooted in botanicals, designed to help you build a routine that works for your hair and everyday life.
+            </p>
+            <div className="flex items-center gap-4 text-xs font-medium tracking-[0.08em] text-lux-text/55">
+              <span>The Luxivie Journal</span>
+              <span>•</span>
+              <span>Hair care, simplified</span>
             </div>
           </div>
         </div>
@@ -77,32 +65,41 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
       <section className="mb-40 px-8 lg:px-20">
         {categories.length > 0 && (
-          <div className="mb-12 flex flex-wrap items-center gap-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#243027]/40">Filter:</span>
-            <Link
-              href="/blog"
-              className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                !category
-                  ? 'border-[#76885B] bg-[#76885B] text-white'
-                  : 'border-[#243027]/10 text-[#243027]/60 hover:border-[#76885B] hover:text-[#76885B]'
-              }`}
-            >
-              All
-            </Link>
-            {categories.map((c) => (
+          <nav className="mb-12 border-y border-lux-text/10 py-5" aria-label="Filter journal articles by topic">
+            <p className="mb-3 text-xs font-medium tracking-[0.08em] text-lux-text/55">Browse by topic</p>
+            <div className="-mx-2 flex gap-2 overflow-x-auto px-2 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
               <Link
-                key={c}
-                href={`/blog?category=${encodeURIComponent(c as string)}`}
-                className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                  category === c
-                    ? 'border-[#76885B] bg-[#76885B] text-white'
-                    : 'border-[#243027]/10 text-[#243027]/60 hover:border-[#76885B] hover:text-[#76885B]'
+                href="/blog"
+                aria-current={!category ? "page" : undefined}
+                className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lux-accent focus-visible:ring-offset-2 ${
+                  !category
+                    ? "border-lux-text bg-lux-text text-white shadow-sm"
+                    : "border-lux-text/15 bg-white/50 text-lux-text/70 hover:border-lux-text/40 hover:bg-white hover:text-lux-text"
                 }`}
               >
-                {c}
+                {!category && <span className="h-1.5 w-1.5 rounded-full bg-lux-accent" aria-hidden="true" />}
+                All topics
               </Link>
-            ))}
-          </div>
+              {categories.map((topic) => {
+                const isActive = category === topic
+                return (
+                  <Link
+                    key={topic}
+                    href={`/blog?category=${encodeURIComponent(topic)}`}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lux-accent focus-visible:ring-offset-2 ${
+                      isActive
+                        ? "border-lux-text bg-lux-text text-white shadow-sm"
+                        : "border-lux-text/15 bg-white/50 text-lux-text/70 hover:border-lux-text/40 hover:bg-white hover:text-lux-text"
+                    }`}
+                  >
+                    {isActive && <span className="h-1.5 w-1.5 rounded-full bg-lux-accent" aria-hidden="true" />}
+                    {topic}
+                  </Link>
+                )
+              })}
+            </div>
+          </nav>
         )}
         <div className="grid grid-cols-1 gap-x-12 gap-y-32 md:grid-cols-2 lg:grid-cols-3">
           {list.length > 0 ? (
@@ -117,28 +114,28 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                   <div className={`${isWide ? "aspect-[16/9]" : "aspect-[3/4]"} relative mb-10 overflow-hidden bg-[#243027]/5`}>
                     <img src={extractFirstImageFromContent(post.content) || post.image_url || FALLBACK_IMAGE} className="h-full w-full object-cover grayscale transition-all duration-700 hover:grayscale-0" alt={post.title} />
                     {!isWide ? (
-                      <div className="absolute bottom-6 right-6 text-[9px] font-bold uppercase tracking-[0.4em] text-white/80 transition-colors [writing-mode:vertical-rl] group-hover:text-white">
+                      <div className="absolute bottom-6 right-6 text-xs font-medium tracking-[0.12em] text-white/80 transition-colors [writing-mode:vertical-rl] group-hover:text-white">
                         {post.category || "Volume VI"}
                       </div>
                     ) : (
                       <>
                         <div className="absolute inset-0 bg-[#243027]/20 transition-all duration-700 group-hover:bg-transparent" />
                         <div className="absolute bottom-10 left-10 max-w-lg">
-                          <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.4em] text-white">{post.category || "Ethics & Planet"}</span>
-                          <h4 className="font-serif text-5xl leading-tight text-white">{post.title}</h4>
+                          <span className="mb-4 block text-xs font-medium tracking-[0.12em] text-white">{post.category || "Ethics & Planet"}</span>
+                          <h4 className="font-serif text-4xl leading-[1.1] tracking-[-0.025em] text-white sm:text-5xl">{post.title}</h4>
                         </div>
                       </>
                     )}
                   </div>
                   <div className="max-w-xs">
-                    <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.3em] text-[#76885B]">{post.category || "Journal"}</span>
-                    <h4 className="mb-4 font-serif text-3xl leading-snug transition-all group-hover:italic">{post.title}</h4>
-                    <p className="mb-6 text-sm leading-relaxed text-[#243027]/50">{post.excerpt || "Explore our latest botanical insights and practical rituals for healthier hair."}</p>
+                    <span className="mb-4 block text-xs font-medium tracking-[0.12em] text-lux-accent">{post.category || "Journal"}</span>
+                    <h4 className="mb-4 font-serif text-2xl leading-snug tracking-[-0.02em] transition-all group-hover:italic sm:text-3xl">{post.title}</h4>
+                    <p className="mb-6 text-sm leading-[1.75] text-lux-text/65">{post.excerpt || "Explore our latest botanical insights and practical rituals for healthier hair."}</p>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#243027] text-[8px] font-bold text-white">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-lux-text text-xs font-medium text-white">
                         {(post.author || "LX").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                       </div>
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#243027]/40">
+                      <span className="text-xs text-lux-text/55">
                         {estimateReadTime(post.content, post.readTime)}
                       </span>
                     </div>
@@ -148,7 +145,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             })
           ) : (
             <div className="col-span-full rounded-sm border border-[#243027]/10 bg-white p-12 text-center">
-              <p className="text-[#243027]/60">No published blog entries yet.</p>
+            <p className="text-lux-text/60">No published blog entries yet.</p>
             </div>
           )}
         </div>
@@ -160,16 +157,16 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <i className="ph ph-flower-lotus absolute -bottom-20 -right-20 -rotate-12 text-[400px] text-white" />
         </div>
         <div className="relative z-10 mx-auto max-w-4xl">
-          <span className="mb-10 block text-[11px] font-bold uppercase tracking-[0.6em] text-[#76885B]">Community Matters</span>
-          <h2 className="mb-12 font-serif text-5xl leading-tight text-[#F2F0EB] lg:text-7xl">
-            Crafting a conscious <br /> <span className="font-normal italic">dialogue.</span>
+          <span className="mb-10 block text-xs font-medium tracking-[0.12em] text-lux-background/60">Community Matters</span>
+          <h2 className="mb-12 font-serif text-4xl tracking-[-0.025em] text-[#F2F0EB] sm:text-5xl lg:text-7xl">
+            Crafting a conscious <br /> <span className="italic">dialogue.</span>
           </h2>
-          <p className="mx-auto mb-16 max-w-2xl text-xl leading-relaxed text-[#F2F0EB]/60">
+          <p className="mx-auto mb-16 max-w-2xl text-base leading-[1.8] text-[#F2F0EB]/60 sm:text-lg">
             Receive our monthly editorial direct to your inbox. No spam, just botanical insights and early access to limited harvests.
           </p>
           <form className="mx-auto flex max-w-xl flex-col gap-4 md:flex-row">
             <input type="email" placeholder="Your Email Address" className="flex-1 rounded-full border border-white/10 bg-white/5 px-8 py-5 text-sm text-white transition-all placeholder:text-white/60 focus:bg-white/10 focus:outline-none" />
-            <button type="button" className="rounded-full bg-[#76885B] px-10 py-5 text-[10px] font-bold uppercase tracking-[0.3em] text-white transition-all hover:bg-white hover:text-[#243027]">
+            <button type="button" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-lux-background px-8 py-3 text-xs font-semibold tracking-[0.04em] text-lux-text transition-colors hover:bg-lux-accent hover:text-white">
               Subscribe
             </button>
           </form>

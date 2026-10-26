@@ -142,7 +142,7 @@ export function LandingNav() {
           {!isBlogSection ? (
             <>
               {NAV_LINKS.map(({ id, label }) => (
-                <a key={id} href={`#${id}`} className={linkClass(id)}>
+                <a key={id} href={`${isHome ? "" : "/"}#${id}`} className={linkClass(id)}>
                   {label}
                 </a>
               ))}
@@ -202,7 +202,7 @@ export function LandingNav() {
             {!isBlogSection ? (
               <>
                 {NAV_LINKS.map(({ id, label }) => (
-                  <a key={id} href={`#${id}`} className={mobileLinkClass(id)} onClick={closeMenu}>
+                  <a key={id} href={`${isHome ? "" : "/"}#${id}`} className={mobileLinkClass(id)} onClick={closeMenu}>
                     {label}
                   </a>
                 ))}
